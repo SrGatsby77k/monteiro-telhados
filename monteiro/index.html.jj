@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4efe7">
+  <meta name="description" content="Monteiro Construções, Reformas, Carpintaria e Telhados em Belo Horizonte e região.">
+  <title>Monteiro | Construções, Reformas, Carpintaria &amp; Telhados</title>
+  <style>
+    :root {
+      --paper: #f5f1eb;
+      --white: #fffdfa;
+      --ink: #302f2b;
+      --muted: #706b65;
+      --wood: #a85d32;
+      --wood-light: #d7b79e;
+      --wood-dark: #203c57;
+      --green: #526d7d;
+      --line: #ded8d0;
+      --gold: #efd9c8;
+      --content: 1100px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 85px; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px/1.65 "Trebuchet MS", Arial, sans-serif;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img, svg { display: block; }
+
+    .wrap {
+      width: min(var(--content), 90%);
+      margin-inline: auto;
+    }
+
+    .header {
+      position: sticky;
+      z-index: 5;
+      top: 0;
+      background: rgba(245, 241, 235, .96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+    }
+
+    .nav {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--wood-dark);
+      flex-shrink: 0;
+    }
+
+    .brand-mark { width: 54px; height: 54px; flex: 0 0 54px; }
+
+    .brand-copy { display: grid; line-height: 1.05; }
+    .brand-name {
+      color: #17314b;
+      font-size: 1.3rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+    }
+
+    .brand-tagline {
+      margin-top: 5px;
+      color: #31475b;
+      font-size: .54rem;
+      font-weight: 800;
+      letter-spacing: .045em;
+      line-height: 1.35;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      font-size: .92rem;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover { color: var(--wood); }
+
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 20px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--wood);
+      color: var(--white);
+      font: inherit;
+      font-weight: 700;
+      transition: background .2s ease, transform .2s ease;
+    }
+
+    .button:hover { background: var(--wood-dark); transform: translateY(-2px); }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #506a7b, #354f65);
+      color: var(--white);
+    }
+
+    .hero::after {
+      position: absolute;
+      inset: -30% auto -30% -45%;
+      width: 30%;
+      content: "";
+      background: linear-gradient(90deg, transparent, #ffffff12, transparent);
+      transform: rotate(18deg);
+      animation: sheen 9s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      min-height: 520px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      align-items: center;
+      gap: 42px;
+      padding-block: 70px;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; }
+
+    h1 {
+      max-width: 650px;
+      margin: 0;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 500;
+      letter-spacing: -.045em;
+      line-height: 1.04;
+    }
+
+    .hero-copy > p:not(.eyebrow) {
+      max-width: 520px;
+      margin: 20px 0 26px;
+      color: #f2f3f1;
+      font-size: 1.07rem;
+    }
+
+    .hero .button { background: var(--gold); color: var(--wood-dark); }
+    .hero .button:hover { background: #f0d39b; }
+
+    .roof-art {
+      width: min(440px, 100%);
+      margin-inline: auto;
+      filter: drop-shadow(0 22px 18px #122a2855);
+      animation: bob 5s ease-in-out infinite;
+    }
+
+    section { padding-block: 72px; }
+
+    .section-heading {
+      max-width: 680px;
+      margin: 0 auto 34px;
+      text-align: center;
+    }
+
+    .section-heading .eyebrow { color: var(--wood); }
+
+    h2 {
+      margin: 0 0 12px;
+      color: var(--green);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 500;
+      letter-spacing: -.035em;
+      line-height: 1.12;
+    }
+
+    .section-heading p { margin: 0; color: var(--muted); }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .service {
+      display: flex;
+      flex-direction: column;
+      min-height: 190px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--white);
+      box-shadow: 0 7px 20px rgba(32, 60, 87, .06);
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+
+    .service:hover {
+      transform: translateY(-4px);
+      border-color: #c9a48d;
+      box-shadow: 0 14px 26px rgba(32, 60, 87, .12);
+    }
+
+    .service-icon {
+      margin-bottom: 14px;
+      font-size: 1.7rem;
+    }
+
+    .service h3, .project h3, .wood h3 {
+      margin: 0 0 8px;
+      color: var(--wood-dark);
+      font-size: 1.2rem;
+    }
+
+    .service p, .project p, .wood p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+
+    .woods-section { background: #eae4dc; }
+
+    .woods {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .wood {
+      overflow: hidden;
+      border-radius: 10px;
+      background: var(--white);
+    }
+
+    .wood-grain {
+      height: 92px;
+      background:
+        repeating-linear-gradient(3deg, transparent 0 12px, #4a2d191c 13px, transparent 15px),
+        linear-gradient(110deg, #9d6943, #d2ae7b 48%, #93603a);
+    }
+
+    .wood:nth-child(2) .wood-grain {
+      background:
+        repeating-linear-gradient(2deg, transparent 0 8px, #24130924 9px, transparent 11px),
+        linear-gradient(95deg, #673621, #995a37, #703b26);
+    }
+
+    .wood:nth-child(3) .wood-grain {
+      background:
+        repeating-linear-gradient(178deg, transparent 0 11px, #482b111c 12px, transparent 14px),
+        linear-gradient(100deg, #ae823e, #d8b875, #a98143);
+    }
+
+    .wood-copy { padding: 18px; }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .project {
+      overflow: hidden;
+      border-radius: 10px;
+      background: var(--white);
+      border: 1px solid var(--line);
+    }
+
+    .project-art {
+      min-height: 165px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, #dfc7b5, #a85d32);
+    }
+
+    .project-art svg { width: 75%; max-width: 220px; }
+    .project:nth-child(2) .project-art { background: linear-gradient(145deg, #d2dfe0, #637f8d); }
+    .project:nth-child(3) .project-art { background: linear-gradient(145deg, #eee0d4, #ae8068); }
+    .project-copy { padding: 17px; }
+
+    .gallery-note {
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: .85rem;
+      text-align: center;
+    }
+
+    .contact {
+      padding: 42px;
+      border-radius: 12px;
+      background: var(--green);
+      color: var(--white);
+      text-align: center;
+    }
+
+    .contact .eyebrow { color: var(--gold); }
+    .contact h2 { color: var(--white); }
+    .contact p { max-width: 560px; margin: 0 auto 22px; color: #e6e9df; }
+    .contact .button { background: var(--gold); color: var(--wood-dark); }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 24px 0 90px;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .footer p { margin: 0; }
+
+    .footer-email {
+      color: var(--wood-dark);
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .footer-email:hover { color: var(--wood); }
+
+    .footer-email:focus-visible {
+      outline: 3px solid var(--wood);
+      outline-offset: 4px;
+    }
+
+    .whatsapp {
+      position: fixed;
+      z-index: 10;
+      right: 18px;
+      bottom: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 30px;
+      background: #39745c;
+      color: white;
+      box-shadow: 0 5px 18px #0003;
+      font-weight: 800;
+    }
+
+    .whatsapp:hover { background: #2b604a; transform: translateY(-2px); }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes sheen {
+      0%, 35% { left: -45%; }
+      75%, 100% { left: 135%; }
+    }
+
+    @media (max-width: 760px) {
+      .nav { min-height: 70px; flex-wrap: wrap; padding-block: 12px; }
+      .nav-links { gap: 14px; font-size: .85rem; }
+      .nav-links .nav-contact { display: none; }
+      .hero-inner { min-height: auto; grid-template-columns: 1fr; padding-block: 56px; }
+      .roof-art { width: min(330px, 85%); }
+      .services, .woods, .gallery { grid-template-columns: 1fr; }
+      .service { min-height: auto; }
+      section { padding-block: 54px; }
+      .contact { padding: 30px 20px; }
+      .footer { align-items: flex-start; flex-direction: column; padding-bottom: 90px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="wrap nav">
+      <a class="brand" href="#inicio" aria-label="Monteiro Construções, Reformas, Carpintaria e Telhados, início">
+        <svg class="brand-mark" viewBox="0 0 64 64" role="img" aria-label="Símbolo vetorial de telhado e carpintaria">
+          <circle cx="32" cy="32" r="29" fill="#f8f4ec" stroke="#a9a39a" stroke-width="2"/>
+          <circle cx="32" cy="32" r="24.5" fill="none" stroke="#d3c8b7" stroke-width="1"/>
+          <path d="M17 31 31 19l14 12" fill="none" stroke="#203c57" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 29v15h20V29M27 44V34l8-6v16" fill="none" stroke="#203c57" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="m31 24 5-4v8" fill="none" stroke="#a85d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M28 34h5m-5 4h5" stroke="#a85d32" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        <span class="brand-copy">
+          <span class="brand-name">MONTEIRO</span>
+          <span class="brand-tagline">Construções · Reformas<br>Carpintaria &amp; Telhados</span>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Menu principal">
+        <a href="#servicos">Serviços</a>
+        <a href="#madeiras">Madeiras</a>
+        <a href="#galeria">Galeria</a>
+        <a class="button nav-contact" href="#contato">Contato</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">Telhados e estruturas · Belo Horizonte e região</p>
+          <h1>Estrutura segura. Acabamento que valoriza.</h1>
+          <p>Construção, reforma e manutenção de telhados com atenção ao seu projeto, escolha cuidadosa de materiais e atendimento direto.</p>
+        </div>
+        <svg class="roof-art" viewBox="0 0 440 330" role="img" aria-label="Ilustração de uma casa com telhado e martelo">
+          <defs>
+            <linearGradient id="roof" x1="0" x2="1" y1="0" y2="1">
+              <stop stop-color="#e0bf8a"/><stop offset="1" stop-color="#9c6941"/>
+            </linearGradient>
+            <linearGradient id="wall" x1="0" x2="0" y1="0" y2="1">
+              <stop stop-color="#f2e5ce"/><stop offset="1" stop-color="#c5a77d"/>
+            </linearGradient>
+          </defs>
+          <path d="M55 152 220 35l165 117v137H55V152Z" fill="url(#wall)" stroke="#39281e" stroke-width="8" stroke-linejoin="round"/>
+          <path d="m31 158 189-137 189 137-24 23L220 71 55 181l-24-23Z" fill="url(#roof)" stroke="#39281e" stroke-width="8" stroke-linejoin="round"/>
+          <path d="M182 289v-91h76v91" fill="#765037" stroke="#39281e" stroke-width="7"/>
+          <path d="M84 190h63v52H84zM293 190h63v52h-63z" fill="#6c9690" stroke="#39281e" stroke-width="7"/>
+          <path d="M114 190v52m-30-26h63m177-26v52m-31-26h63" stroke="#39281e" stroke-width="5"/>
+          <g transform="translate(316 28) rotate(22)">
+            <rect x="22" y="7" width="13" height="92" rx="6" fill="#62432d"/>
+            <path d="M2 5h53v20H2c-7 0-10-4-10-10S-5 5 2 5Z" fill="#e2bd78" stroke="#39281e" stroke-width="5"/>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <section id="servicos">
+      <div class="wrap">
+        <div class="section-heading">
+          <p class="eyebrow">Como podemos ajudar</p>
+          <h2>Serviços para sua cobertura</h2>
+          <p>Atendimento simples e direto, do primeiro contato à execução do serviço.</p>
+        </div>
+        <div class="services">
+          <article class="service">
+            <div class="service-icon" aria-hidden="true">⌂</div>
+            <h3>Construção de telhados</h3>
+            <p>Estruturas em madeira e coberturas planejadas para as necessidades da obra.</p>
+          </article>
+          <article class="service">
+            <div class="service-icon" aria-hidden="true">🔨</div>
+            <h3>Reforma e manutenção</h3>
+            <p>Reparos e melhorias para manter telhados seguros e funcionais.</p>
+          </article>
+          <article class="service">
+            <div class="service-icon" aria-hidden="true">▱</div>
+            <h3>Instalação de coberturas</h3>
+            <p>Instalação e acabamento conforme o tipo de imóvel e projeto.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="woods-section" id="madeiras">
+      <div class="wrap">
+        <div class="section-heading">
+          <p class="eyebrow">Materiais</p>
+          <h2>Madeira com escolha consciente</h2>
+          <p>A espécie, o tratamento e o dimensionamento devem ser avaliados para cada estrutura.</p>
+        </div>
+        <div class="woods">
+          <article class="wood">
+            <div class="wood-grain" aria-hidden="true"></div>
+            <div class="wood-copy"><h3>Eucalipto tratado</h3><p>Opção comum em estruturas; confirme tratamento e procedência com o fornecedor.</p></div>
+          </article>
+          <article class="wood">
+            <div class="wood-grain" aria-hidden="true"></div>
+            <div class="wood-copy"><h3>Paraju / Aparaju</h3><p>Verifique espécie, origem e características do lote antes de especificar.</p></div>
+          </article>
+          <article class="wood">
+            <div class="wood-grain" aria-hidden="true"></div>
+            <div class="wood-copy"><h3>Angelim</h3><p>A indicação depende da espécie identificada e do dimensionamento da estrutura.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="galeria">
+      <div class="wrap">
+        <div class="section-heading">
+          <p class="eyebrow">Referências</p>
+          <h2>Inspiração para o seu projeto</h2>
+          <p>Ilustrações demonstrativas que podem ser trocadas por fotos reais dos serviços.</p>
+        </div>
+        <div class="gallery">
+          <article class="project">
+            <div class="project-art" aria-hidden="true">
+              <svg viewBox="0 0 220 130" fill="none"><path d="m20 70 90-56 90 56v48H20V70Z" fill="#e8d8bd" stroke="#493522" stroke-width="6"/><path d="m9 72 101-64 101 64-12 13-89-55-89 55L9 72Z" fill="#725038"/><rect x="91" y="75" width="38" height="43" fill="#805437"/><rect x="39" y="79" width="31" height="26" fill="#7fa29a"/><rect x="150" y="79" width="31" height="26" fill="#7fa29a"/></svg>
+            </div>
+            <div class="project-copy"><h3>Telhado residencial</h3><p>Exemplo ilustrativo de cobertura para residência.</p></div>
+          </article>
+          <article class="project">
+            <div class="project-art" aria-hidden="true">
+              <svg viewBox="0 0 220 130" fill="none"><path d="m22 69 88-56 88 56v51H22V69Z" fill="#e2d5bd" stroke="#40362b" stroke-width="6"/><path d="m10 72 100-64 100 64-12 13-88-56-88 56L10 72Z" fill="#294b42"/><path d="M48 77v41m31-59v59m31-78v78m31-59v59m31-41v41" stroke="#a97749" stroke-width="7"/><path d="M30 118h160" stroke="#40362b" stroke-width="7"/></svg>
+            </div>
+            <div class="project-copy"><h3>Estrutura em madeira</h3><p>Referência visual de estrutura e acabamento.</p></div>
+          </article>
+          <article class="project">
+            <div class="project-art" aria-hidden="true">
+              <svg viewBox="0 0 220 130" fill="none"><path d="m20 69 90-57 90 57v50H20V69Z" fill="#e8dcc8" stroke="#493522" stroke-width="6"/><path d="m8 72 102-65 102 65-13 13-89-57-89 57L8 72Z" fill="#a16b42"/><path d="M50 86h120M50 99h120M50 112h120" stroke="#744c31" stroke-width="5"/><rect x="92" y="78" width="36" height="41" fill="#536f68"/></svg>
+            </div>
+            <div class="project-copy"><h3>Reforma de cobertura</h3><p>Ideia de renovação para diferentes imóveis.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="contato">
+      <div class="wrap contact">
+        <p class="eyebrow">Atendimento em Belo Horizonte e região</p>
+        <h2>Vamos conversar sobre sua obra?</h2>
+        <p>Use o botão flutuante do WhatsApp para falar diretamente com a Monteiro.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <p>© 2026 Monteiro · Construções, Reformas, Carpintaria &amp; Telhados · Belo Horizonte, MG</p>
+    <a class="footer-email" href="mailto:cnap9988@gmail.com?subject=D%C3%BAvida%20sobre%20os%20servi%C3%A7os">Dúvidas? cnap9988@gmail.com</a>
+  </footer>
+
+  <a class="whatsapp" href="https://wa.me/5531989065898?text=Ol%C3%A1%2C%20Monteiro!%20Gostaria%20de%20conversar%20sobre%20um%20servi%C3%A7o." target="_blank" rel="noopener noreferrer" aria-label="Abrir conversa com Monteiro pelo WhatsApp">
+    <span aria-hidden="true">☏</span> WhatsApp
+  </a>
+</body>
+</html>
