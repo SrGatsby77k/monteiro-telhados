@@ -1,0 +1,1735 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07100b">
+  <meta name="description" content="SrGatsby0.1: painel protegido para consultas autorizadas, fontes confiáveis e assistência.">
+  <link rel="icon" type="image/jpeg" href="assets/srgatsby-icon.jpg">
+  <title>SrGatsby0.1 // Painel seguro</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070b08;
+      --panel: #0c130e;
+      --panel-raised: #101a13;
+      --line: #1d3022;
+      --green: #83f28f;
+      --green-strong: #38d96a;
+      --text: #e7f1e8;
+      --muted: #8b9b8e;
+      --amber: #f3c96b;
+      --red: #ff8585;
+      --radius: 16px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--text);
+      isolation: isolate;
+      background: var(--bg);
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -14px;
+      z-index: -1;
+      background: linear-gradient(135deg, #030805d9, #07100bd9), url("assets/srgatsby-icon.jpg") center / cover no-repeat;
+      filter: blur(8px);
+      transform: scale(1.03);
+      pointer-events: none;
+    }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
+    .sidebar {
+      position: sticky; top: 0; height: 100vh; padding: 28px 18px;
+      border-right: 1px solid var(--line); background: #080e0aeb; backdrop-filter: blur(14px);
+      display: flex; flex-direction: column; z-index: 2;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 2px 9px 34px; }
+    .brand-mark {
+      display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px;
+      color: #07100b; font: 800 17px ui-monospace, SFMono-Regular, Consolas, monospace;
+      background: linear-gradient(145deg, #a4ffad, #39d76a); box-shadow: 0 0 24px #48ed7033;
+      overflow: hidden;
+    }
+    .brand-mark img { width: 100%; height: 100%; display: block; object-fit: cover; }
+    .brand-name { font: 700 14px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .12em; }
+    .brand-name span { display: block; color: var(--muted); font: 10px ui-sans-serif, system-ui; letter-spacing: .14em; margin-top: 4px; }
+    .nav-label { color: #607064; font: 700 10px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .16em; padding: 0 11px 10px; }
+    nav { display: grid; gap: 5px; }
+    nav a {
+      color: var(--muted); text-decoration: none; padding: 11px 12px; border-radius: 10px;
+      font-size: 13px; transition: .18s ease;
+    }
+    nav a:hover, nav a:focus-visible, nav a.active { color: var(--green); background: #14251a; outline: none; }
+    nav a .nav-icon { display: inline-block; width: 24px; color: var(--green-strong); font-family: ui-monospace, monospace; }
+    .sidebar-bottom { margin-top: auto; }
+    .system-card { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); padding: 14px; }
+    .system-label { color: var(--muted); font-size: 11px; }
+    .online { color: var(--green); display: flex; gap: 8px; align-items: center; margin-top: 8px; font-size: 12px; }
+    .online::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green-strong); box-shadow: 0 0 10px var(--green-strong); }
+    .side-note { color: #657369; font-size: 10px; line-height: 1.6; margin: 13px 3px 0; }
+    main { min-width: 0; width: min(1190px, 100%); margin: 0 auto; padding: 32px clamp(18px, 4vw, 52px) 48px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 34px; }
+    .crumb { color: var(--muted); font: 11px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .08em; }
+    .user-chip { display: flex; gap: 10px; align-items: center; padding: 8px 11px; border: 1px solid var(--line); border-radius: 999px; background: #0a110c; color: #cbd8ce; font-size: 11px; }
+    .account-controls { display: flex; align-items: center; gap: 9px; }
+    .logout-button { border: 1px solid #2b4431; border-radius: 999px; background: transparent; color: #cbd8ce; padding: 8px 11px; font-size: 10px; cursor: pointer; }
+    .logout-button:hover { border-color: #3a6846; color: var(--green); }
+    .avatar { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: #17321e; color: var(--green); font: 700 11px ui-monospace, monospace; }
+    .hero { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; margin-bottom: 24px; }
+    .eyebrow { color: var(--green); font: 700 10px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .17em; text-transform: uppercase; margin: 0 0 11px; }
+    h1 { margin: 0; font-size: clamp(26px, 4vw, 37px); letter-spacing: -.04em; line-height: 1.1; }
+    .subtitle { color: var(--muted); margin: 10px 0 0; font-size: 13px; }
+    .demo-pill { white-space: nowrap; border: 1px solid #67562c; border-radius: 999px; background: #211b0d; padding: 8px 11px; color: var(--amber); font: 700 10px ui-monospace, monospace; letter-spacing: .08em; }
+    .social-panel { margin-bottom: 20px; }
+    .social-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; margin-top: 15px; }
+    .social-link { min-width: 0; display: flex; align-items: center; gap: 11px; padding: 12px; border: 1px solid var(--line); border-radius: 11px; background: #0a110c; color: var(--text); text-decoration: none; transition: .18s ease; }
+    .social-link:hover, .social-link:focus-visible { border-color: #3a6846; background: #122219; transform: translateY(-1px); outline: none; }
+    .social-icon { display: grid; place-items: center; flex: 0 0 34px; width: 34px; height: 34px; border-radius: 9px; background: #14251a; color: var(--green); font: 700 14px ui-monospace, monospace; }
+    .social-name { display: block; font-size: 11px; font-weight: 650; }
+    .social-hint { display: block; color: var(--muted); font-size: 9px; margin-top: 3px; }
+    .social-search { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 18px; }
+    .social-search-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(150px, .4fr) auto; align-items: end; gap: 10px; }
+    .social-search-form label { margin-top: 0; }
+    .social-search-form .primary { margin: 0; min-height: 42px; white-space: nowrap; }
+    .social-search-results { display: grid; gap: 9px; margin-top: 14px; }
+    .social-result { min-width: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 10px; background: #080e0a; padding: 12px; }
+    .social-result-info { min-width: 0; }
+    .social-result-title { color: var(--text); font-size: 12px; font-weight: 650; overflow-wrap: anywhere; }
+    .social-result-meta { color: var(--muted); font-size: 10px; margin-top: 4px; }
+    .social-result-bio { color: #b6c4b9; font-size: 10px; line-height: 1.5; margin-top: 7px; overflow-wrap: anywhere; }
+    .social-result-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; }
+    .social-result-actions a, .small-action { border: 1px solid #2b4431; border-radius: 8px; background: #0c1710; color: var(--green); padding: 8px 10px; font-size: 10px; text-decoration: none; cursor: pointer; }
+    .social-result-actions a:hover, .small-action:hover { border-color: var(--green-strong); }
+    .social-result-actions button:disabled { opacity: .55; cursor: wait; }
+    .social-saved { margin-top: 15px; }
+    .social-saved-list { display: grid; gap: 8px; margin-top: 12px; }
+    .social-saved-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); padding: 9px 0; }
+    .social-search-note { color: var(--muted); font-size: 10px; line-height: 1.55; margin: 9px 0 0; }
+    .social-private-login { position: fixed; inset: 0; z-index: 21; display: grid; place-items: center; overflow-y: auto; padding: 24px; background: #030805e8; backdrop-filter: blur(8px); }
+    .social-private-login .login-card { max-height: calc(100vh - 48px); overflow-y: auto; }
+    .store-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, .7fr); gap: 16px; margin-top: 16px; align-items: start; }
+    .product-list, .cart-items, .product-admin-list { display: grid; gap: 9px; }
+    .product-card, .cart-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 10px; background: #080e0a; padding: 12px; }
+    .product-details { min-width: 0; }
+    .product-name { color: var(--text); font-size: 12px; font-weight: 650; }
+    .product-description { color: var(--muted); font-size: 10px; line-height: 1.5; margin-top: 4px; overflow-wrap: anywhere; }
+    .product-price { color: var(--green); font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .cart-panel { border: 1px solid var(--line); border-radius: 12px; background: #080e0a; padding: 16px; }
+    .cart-title-row, .cart-total { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .cart-title-row { margin-bottom: 12px; }
+    .cart-total { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 12px; color: var(--text); font-size: 12px; font-weight: 700; }
+    .cart-item { padding: 9px 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; }
+    .cart-item-controls { display: flex; align-items: center; gap: 6px; }
+    .cart-item-controls button { border: 1px solid #2b4431; border-radius: 6px; background: #0c1710; color: var(--green); min-width: 27px; min-height: 27px; cursor: pointer; }
+    .cart-item-controls button:disabled { opacity: .5; cursor: not-allowed; }
+    .product-admin-form { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 15px; }
+    .product-admin-form textarea { width: 100%; min-height: 72px; border: 1px solid #27382c; border-radius: 9px; outline: none; background: #080e0a; color: var(--text); padding: 10px 12px; font: inherit; font-size: 12px; resize: vertical; }
+    .product-admin-form textarea:focus { border-color: var(--green-strong); box-shadow: 0 0 0 3px #38d96a1a; }
+    .product-admin-list { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 14px; }
+    .store-note { color: var(--muted); font-size: 10px; line-height: 1.55; margin: 10px 0 0; }
+    .special-catalog { overflow: hidden; margin-bottom: 20px; }
+    .catalog-banner { position: relative; overflow: hidden; border: 1px solid #285638; border-radius: 13px; padding: 18px 22px; background: radial-gradient(ellipse at 90% 15%, #26753d66, transparent 38%), linear-gradient(120deg, #102417, #09100b 72%); }
+    .catalog-banner::after { content: "＋"; position: absolute; right: 7%; top: -27px; color: #83f28f13; font-size: 145px; font-weight: 900; line-height: 1; pointer-events: none; }
+    .catalog-banner > * { position: relative; z-index: 1; }
+    .catalog-kicker { color: var(--green); font: 700 10px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .15em; text-transform: uppercase; }
+    .catalog-banner h2 { max-width: 560px; margin: 7px 0 5px; font-size: clamp(21px, 3vw, 29px); letter-spacing: -.04em; }
+    .catalog-banner p { max-width: 560px; margin: 0; color: #afc2b2; font-size: 11px; line-height: 1.55; }
+    .catalog-search { display: flex; align-items: center; gap: 10px; margin: 12px 0; padding: 4px 6px 4px 12px; border: 1px solid #294331; border-radius: 11px; background: #080e0a; }
+    .catalog-search-icon { color: var(--green); font-size: 17px; }
+    .catalog-search input { width: 100%; min-width: 0; min-height: 36px; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 12px; }
+    .catalog-search:focus-within { border-color: var(--green-strong); box-shadow: 0 0 0 3px #38d96a1a; }
+    .catalog-filters { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+    .catalog-filter { border: 1px solid #294331; border-radius: 999px; padding: 7px 11px; background: #0a110c; color: #bdcbbf; font-size: 10px; cursor: pointer; transition: .18s ease; }
+    .catalog-filter:hover, .catalog-filter:focus-visible, .catalog-filter[aria-pressed="true"] { border-color: #3d9b54; background: #173320; color: var(--green); outline: none; }
+    .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); gap: 9px; }
+    .catalog-card { min-width: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; background: linear-gradient(155deg, #101a13, #080e0a 78%); padding: 12px; transition: border-color .18s ease, transform .18s ease; }
+    .catalog-card:hover { transform: translateY(-2px); border-color: #397348; }
+    .catalog-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .catalog-card-icon { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid #31573a; border-radius: 11px; background: #14251a; color: var(--green); font-size: 19px; }
+    .catalog-card-category { border: 1px solid #294331; border-radius: 999px; padding: 5px 8px; color: #a9c5ae; font-size: 9px; }
+    .catalog-card h3 { margin: 10px 0 5px; font-size: 12px; }
+    .catalog-card p { flex: 1; margin: 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .catalog-card-link { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin-top: 10px; color: var(--green); font-size: 10px; font-weight: 700; text-decoration: none; }
+    .catalog-card-link:hover, .catalog-card-link:focus-visible { color: #b4ffbc; text-decoration: underline; }
+    .catalog-empty { grid-column: 1 / -1; margin: 0; border: 1px dashed #294331; border-radius: 10px; padding: 20px; color: var(--muted); font-size: 11px; text-align: center; }
+    .catalog-more { display: block; margin: 12px auto 0; }
+    .catalog-footnote { margin: 14px 0 0; color: #849587; font-size: 10px; line-height: 1.6; }
+    @media (max-width: 680px) {
+      .social-search-form { grid-template-columns: 1fr; }
+      .social-result { align-items: flex-start; flex-direction: column; }
+      .social-result-actions { width: 100%; }
+      .store-grid { grid-template-columns: 1fr; }
+      .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 440px) { .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; } .catalog-card { padding: 10px; } }
+    .notice { display: flex; gap: 12px; align-items: flex-start; border: 1px solid #534526; border-radius: 12px; padding: 14px 16px; background: #19160e; color: #d9c99d; font-size: 12px; line-height: 1.55; margin-bottom: 20px; }
+    .notice strong { color: #f4d785; }
+    .notice-icon { color: var(--amber); font: 700 15px ui-monospace, monospace; }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; margin-bottom: 22px; }
+    .stat { border: 1px solid var(--line); border-radius: 13px; background: linear-gradient(150deg, #0e1710, #0a100c); padding: 16px; }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 11px; }
+    .stat-icon { color: var(--green); font: 14px ui-monospace, monospace; }
+    .stat-value { display: block; margin-top: 12px; font-size: 22px; font-weight: 650; letter-spacing: -.04em; }
+    .stat-caption { color: #728176; font-size: 10px; margin-top: 4px; }
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr); gap: 16px; align-items: start; }
+    .panel { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(155deg, #0e1710, #0a100c 75%); padding: 21px; box-shadow: 0 18px 48px #00000014; }
+    .panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 17px; }
+    .panel h2 { font-size: 15px; margin: 0; letter-spacing: -.015em; }
+    .panel-description { color: var(--muted); font-size: 11px; line-height: 1.55; margin: 6px 0 0; }
+    .tag { color: var(--green); border: 1px solid #254b30; border-radius: 7px; padding: 5px 7px; font: 9px ui-monospace, monospace; white-space: nowrap; }
+    label { display: block; margin: 15px 0 7px; color: #c8d4ca; font-size: 11px; }
+    input[type="tel"], input[type="text"], input[type="url"], select {
+      width: 100%; height: 42px; border: 1px solid #27382c; border-radius: 9px; outline: none;
+      background: #080e0a; color: var(--text); padding: 0 12px; font-size: 12px; transition: border-color .16s, box-shadow .16s;
+    }
+    input::placeholder { color: #617064; }
+    input:focus { border-color: var(--green-strong); box-shadow: 0 0 0 3px #38d96a1a; }
+    .consent { display: flex; align-items: flex-start; gap: 9px; color: var(--muted); font-size: 10px; line-height: 1.5; margin-top: 13px; }
+    .consent input { accent-color: var(--green-strong); margin: 1px 0 0; }
+    .primary, .secondary, .remove-button {
+      border: 0; border-radius: 9px; cursor: pointer; transition: transform .15s, background .15s, border-color .15s;
+    }
+    .primary { margin-top: 15px; padding: 11px 15px; background: var(--green); color: #07100b; font-size: 11px; font-weight: 750; }
+    .primary:hover { background: #a4ffad; transform: translateY(-1px); }
+    .primary:disabled, .logout-button:disabled { opacity: .65; cursor: wait; transform: none; }
+    .secondary { border: 1px solid #2b4431; background: #132018; color: var(--green); padding: 9px 12px; font-size: 10px; font-weight: 650; }
+    .secondary:hover { background: #1a2e20; border-color: #3a6846; }
+    button:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+    .feedback { min-height: 18px; margin: 12px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .feedback.success { color: var(--green); }
+    .feedback.error { color: var(--red); }
+    .feedback.info { color: var(--amber); }
+    .divider { height: 1px; border: 0; background: var(--line); margin: 20px 0; }
+    .list-toolbar { display: flex; gap: 9px; align-items: center; margin: 0 0 13px; }
+    .list-toolbar input { height: 36px; }
+    .sites-list { display: grid; gap: 9px; }
+    .empty { border: 1px dashed #28392d; border-radius: 10px; padding: 18px 12px; text-align: center; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .site-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #1b2b1f; background: #0a110c; border-radius: 10px; padding: 11px; }
+    .site-main { min-width: 0; display: flex; align-items: center; gap: 10px; }
+    .site-icon { flex: 0 0 30px; display: grid; place-items: center; height: 30px; border-radius: 8px; background: #15291a; color: var(--green); font: 13px ui-monospace, monospace; }
+    .site-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #dce8de; font-size: 11px; font-weight: 650; }
+    .site-url { display: block; color: #718074; font-size: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 4px; text-decoration: none; }
+    .site-url:hover { color: var(--green); }
+    .remove-button { background: transparent; color: #829186; padding: 7px; font-size: 10px; }
+    .remove-button:hover { background: #271415; color: var(--red); }
+    .access-list { display: grid; gap: 13px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .access-list li { display: flex; gap: 10px; color: #b7c5ba; font-size: 11px; line-height: 1.5; }
+    .access-list li span { color: var(--green); font-family: ui-monospace, monospace; }
+    .access-footer { color: #77877b; font-size: 10px; line-height: 1.6; border-top: 1px solid var(--line); margin-top: 18px; padding-top: 14px; }
+    .assistant-panel { margin-top: 16px; }
+    .chat-log { display: grid; align-content: start; gap: 10px; max-height: 300px; overflow-y: auto; padding: 3px 4px 3px 0; }
+    .chat-message { max-width: 88%; border: 1px solid #203425; border-radius: 12px; background: #0a110c; padding: 10px 12px; color: #c8d6cb; font-size: 11px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .chat-message.assistant { justify-self: start; border-top-left-radius: 4px; }
+    .chat-message.user { justify-self: end; border-color: #315a3a; background: #122219; color: #e4f2e7; border-top-right-radius: 4px; }
+    .chat-message.error { border-color: #613538; color: #ffaaaa; }
+    .company-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: 15px; }
+    .company-field { min-width: 0; border: 1px solid #1b2b1f; border-radius: 9px; background: #0a110c; padding: 10px; }
+    .company-field.wide { grid-column: 1 / -1; }
+    .company-label { color: var(--muted); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
+    .company-value { color: #e2eee4; font-size: 11px; line-height: 1.5; margin-top: 5px; overflow-wrap: anywhere; }
+    .company-status { display: inline-flex; align-items: center; gap: 6px; }
+    .chat-form { display: flex; gap: 9px; align-items: flex-end; margin-top: 12px; }
+    .chat-form input { min-width: 0; flex: 1; }
+    .chat-form .primary { flex: 0 0 auto; margin: 0; height: 42px; }
+    .chat-note { color: #77877b; font-size: 10px; line-height: 1.55; margin: 9px 0 0; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    .login-screen { position: fixed; inset: 0; z-index: 20; min-height: 100vh; overflow-y: auto; display: grid; place-items: center; padding: 24px; background: #030805c9; backdrop-filter: blur(8px); }
+    .login-card { width: min(420px, 100%); border: 1px solid #6aa57655; border-radius: 18px; background: #080e0ad9; backdrop-filter: blur(16px); padding: clamp(22px, 6vw, 36px); box-shadow: 0 24px 80px #0008; }
+    .login-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
+    .login-card h1 { font-size: 25px; }
+    .login-intro { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 9px 0 22px; }
+    .login-card input { width: 100%; height: 44px; border: 1px solid #27382c; border-radius: 9px; outline: none; background: #080e0a; color: var(--text); padding: 0 12px; font-size: 13px; }
+    .login-card input:focus { border-color: var(--green-strong); box-shadow: 0 0 0 3px #38d96a1a; }
+    .login-card .primary { width: 100%; min-height: 42px; }
+    .auth-switch { width: 100%; min-height: 40px; margin-top: 12px; }
+    .login-message { min-height: 20px; color: var(--red); font-size: 11px; line-height: 1.5; margin: 12px 0 0; }
+    .login-footnote { border-top: 1px solid var(--line); color: #77877b; font-size: 10px; line-height: 1.55; margin: 19px 0 0; padding-top: 14px; }
+    footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; color: #66756a; font: 10px ui-monospace, monospace; margin-top: 25px; }
+    @media (max-width: 920px) {
+      .shell { grid-template-columns: 205px minmax(0, 1fr); }
+      .content-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 680px) {
+      .shell { display: block; }
+      .sidebar { position: static; height: auto; padding: 14px 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .brand { padding: 0 2px 12px; }
+      .nav-label, .sidebar-bottom { display: none; }
+      nav { display: flex; flex-wrap: wrap; overflow: visible; gap: 4px; padding-bottom: 2px; }
+      nav a { white-space: nowrap; padding: 8px 9px; font-size: 10px; }
+      nav a .nav-icon { width: 17px; }
+      main { padding-top: 22px; }
+      .topbar { margin-bottom: 24px; }
+      .hero { align-items: flex-start; flex-direction: column; gap: 12px; }
+    }
+    @media (max-width: 440px) {
+      .social-links { grid-template-columns: 1fr; gap: 8px; }
+      .stats { grid-template-columns: 1fr; gap: 8px; }
+      .stat { padding: 13px; }
+      .stat-value { display: inline-block; margin: 8px 8px 0 0; }
+      .stat-caption { display: inline-block; }
+      .panel { padding: 16px; }
+      .company-results { grid-template-columns: 1fr; }
+      .company-field.wide { grid-column: auto; }
+      .user-chip { font-size: 0; gap: 0; padding: 5px; }
+      .logout-button { padding: 7px 9px; }
+      .avatar { width: 28px; height: 28px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <section class="login-screen" id="login-screen" aria-label="Página inicial do SrGatsby0.1">
+    <div class="login-card landing-card">
+      <div class="login-brand"><div class="brand-mark"><img src="assets/srgatsby-icon.jpg" alt=""></div><div class="brand-name">SrGatsby0.1<span>SECURE WORKSPACE</span></div></div>
+      <button class="primary" id="enter-button" type="button">Entrar</button>
+      <p class="login-message" id="landing-message" role="status" aria-live="polite"></p>
+    </div>
+    <div id="auth-forms" class="social-private-login" hidden>
+      <div class="login-card">
+      <button class="secondary auth-switch" id="cancel-private-login" type="button">Voltar ao painel</button>
+      <h1 id="login-title">Entrar no painel.</h1>
+      <p class="login-intro">Use seu usuário e sua senha para acessar o espaço de trabalho. As contas são criadas pelo administrador.</p>
+      <form id="login-form">
+        <label for="login-username">Usuário</label>
+        <input id="login-username" name="username" type="text" minlength="3" maxlength="32" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <label for="login-password">Senha</label>
+        <input id="login-password" name="password" type="password" minlength="6" maxlength="6" autocomplete="current-password" aria-describedby="password-rule" required>
+        <p class="panel-description" id="password-rule">A senha tem 6 caracteres: exatamente 5 números e 1 símbolo (! @ # $ % &amp; * _ -).</p>
+        <button class="primary" id="login-submit" type="submit">Entrar com segurança</button>
+        <p class="login-message" id="login-message" role="status" aria-live="polite"></p>
+      </form>
+      <button class="secondary auth-switch" id="show-register" type="button">Tenho um convite — criar conta</button>
+      <form id="register-form" hidden>
+        <p class="login-intro">Cadastre-se com o código de convite fornecido pelo administrador.</p>
+        <label for="register-invite">Código de convite</label>
+        <input id="register-invite" name="invite" type="text" minlength="32" maxlength="64" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" required>
+        <label for="register-username">Escolha um usuário</label>
+        <input id="register-username" name="username" type="text" minlength="3" maxlength="32" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <label for="register-password">Escolha uma senha</label>
+        <input id="register-password" name="password" type="password" minlength="6" maxlength="6" autocomplete="new-password" aria-describedby="password-rule" required>
+        <label for="register-confirm-password">Confirme a senha</label>
+        <input id="register-confirm-password" name="confirmPassword" type="password" minlength="6" maxlength="6" autocomplete="new-password" required>
+        <button class="primary" id="register-submit" type="submit">Criar minha conta</button>
+        <p class="login-message" id="register-message" role="status" aria-live="polite"></p>
+      </form>
+      <button class="secondary auth-switch" id="show-login" type="button" hidden>Voltar para entrar</button>
+      <p class="login-footnote">Não compartilhe sua senha. Essa senha curta oferece menos proteção; use somente em um ambiente confiável. O cadastro exige convite do administrador.</p>
+      </div>
+    </div>
+  </section>
+  <div class="shell" id="workspace" hidden>
+    <aside class="sidebar" aria-label="Menu principal">
+      <div class="brand"><div class="brand-mark"><img src="assets/srgatsby-icon.jpg" alt=""></div><div class="brand-name">SrGatsby0.1<span>SECURE WORKSPACE</span></div></div>
+      <div class="nav-label">ESPAÇO DE TRABALHO</div>
+      <nav aria-label="Navegação">
+        <a class="active" href="#overview" aria-current="page"><span class="nav-icon">01</span> Visão geral</a>
+        <a href="#social-panel"><span class="nav-icon">02</span> Redes sociais</a>
+        <a href="#cnpj-search"><span class="nav-icon">03</span> Consulta CNPJ</a>
+        <a href="#phone-search"><span class="nav-icon">04</span> Busca autorizada</a>
+        <a href="#trusted-sites"><span class="nav-icon">05</span> Sites confiáveis</a>
+        <a href="#access"><span class="nav-icon">06</span> Acesso e nuvem</a>
+        <a href="#assistant"><span class="nav-icon">07</span> Assistente IA</a>
+        <a href="#store"><span class="nav-icon">08</span> Loja e carrinho</a>
+        <a href="#special-catalog"><span class="nav-icon">09</span> Catálogo especial</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="system-card"><div class="system-label">Estado do painel</div><div class="online">Acesso público</div></div>
+        <p class="side-note">Use somente fontes e dados para os quais você tenha autorização.</p>
+      </div>
+    </aside>
+
+    <main id="overview">
+      <div class="topbar"><div class="crumb">SrGatsby0.1 <span aria-hidden="true">/</span> PAINEL</div><div class="account-controls"><div class="user-chip"><span class="avatar" id="user-avatar">V</span><span id="current-username">Visitante</span></div><button class="logout-button" id="logout-button" type="button">Início</button></div></div>
+      <section class="hero" data-view="overview" aria-labelledby="page-title">
+        <div><p class="eyebrow">&gt; ambiente de consulta</p><h1 id="page-title">Seu espaço de trabalho.</h1><p class="subtitle">Organize fontes confiáveis e consultas autorizadas em um só lugar.</p></div>
+        <div class="demo-pill">● ACESSO PÚBLICO</div>
+      </section>
+
+      <section class="panel social-panel" id="social-panel" data-view="social-panel" aria-labelledby="social-title">
+        <div class="panel-heading"><div><h2 id="social-title">Redes sociais</h2><p class="panel-description">Atalhos para as plataformas. Você pode trocar os destinos pelos seus perfis quando quiser.</p></div><span class="tag">ATALHOS</span></div>
+        <div class="social-links">
+          <a class="social-link" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Abrir Instagram em uma nova aba">
+            <span class="social-icon" aria-hidden="true">◎</span><span><span class="social-name">Instagram</span><span class="social-hint">Abrir plataforma ↗</span></span>
+          </a>
+          <a class="social-link" href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" aria-label="Abrir TikTok em uma nova aba">
+            <span class="social-icon" aria-hidden="true">♪</span><span><span class="social-name">TikTok</span><span class="social-hint">Abrir plataforma ↗</span></span>
+          </a>
+          <a class="social-link" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="Abrir YouTube em uma nova aba">
+            <span class="social-icon" aria-hidden="true">▶</span><span><span class="social-name">YouTube</span><span class="social-hint">Abrir plataforma ↗</span></span>
+          </a>
+        </div>
+        <div class="social-search" id="social-search">
+          <div class="panel-heading"><div><h2>Pesquisa de perfis públicos</h2><p class="panel-description">Busque por nome ou usuário em fontes públicas, sem acessar perfis privados.</p></div><span class="tag">API PÚBLICA</span></div>
+          <form class="social-search-form" id="social-search-form">
+            <div><label for="social-query">Nome ou usuário</label><input id="social-query" name="query" type="text" maxlength="80" autocomplete="off" placeholder="Ex.: usuario ou assunto" required></div>
+            <div><label for="social-provider">Fonte</label><select id="social-provider" name="provider"><option value="all">Bluesky + Mastodon</option><option value="bluesky">Bluesky</option><option value="mastodon">Mastodon</option></select></div>
+            <button class="primary" id="social-search-submit" type="submit">⌕ &nbsp; Pesquisar</button>
+          </form>
+          <p class="social-search-note">As consultas passam pelo servidor do app. APIs oficiais gratuitas disponíveis nesta versão: Bluesky e Mastodon. Instagram, TikTok, X, YouTube e Reddit não são consultados por scraping nem por APIs não autorizadas.</p>
+          <p class="feedback" id="social-search-feedback" role="status" aria-live="polite"></p>
+          <div class="social-search-results" id="social-search-results" aria-live="polite"></div>
+          <div class="social-saved">
+            <button class="secondary" id="social-saved-toggle" type="button">Entrar para ver arquivos privados</button>
+            <div class="panel" id="social-saved-panel" hidden>
+              <div class="panel-heading"><div><h2>Arquivo privado</h2><p class="panel-description">Perfis salvos nesta conta, armazenados no servidor.</p></div><span class="tag">PRIVADO</span></div>
+              <p class="feedback" id="social-saved-feedback" role="status" aria-live="polite"></p>
+              <div class="social-saved-list" id="social-saved-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="store" data-view="store" aria-labelledby="store-title" style="margin-bottom:20px">
+        <div class="panel-heading"><div><h2 id="store-title">Loja e carrinho</h2><p class="panel-description">Catálogo público e carrinho salvo neste navegador.</p></div><span class="tag">SEM COBRANÇA</span></div>
+        <div class="store-grid">
+          <div>
+            <p class="feedback" id="products-feedback" role="status" aria-live="polite"></p>
+            <div class="product-list" id="product-list" aria-live="polite"></div>
+          </div>
+          <aside class="cart-panel" aria-label="Carrinho de compras">
+            <div class="cart-title-row"><h2 style="margin:0;font-size:14px">Seu carrinho</h2><span class="tag" id="cart-count">0 itens</span></div>
+            <div class="cart-items" id="cart-items" aria-live="polite"></div>
+            <div class="cart-total"><span>Total</span><strong id="cart-total">R$ 0,00</strong></div>
+            <button class="primary" id="checkout-button" type="button" disabled style="width:100%;margin-top:12px">Pagamentos não configurados</button>
+            <p class="store-note">Carrinho demonstrativo: nenhuma cobrança ou pedido é enviado. Um gateway será integrado somente depois da configuração de produtos e credenciais.</p>
+          </aside>
+        </div>
+        <button class="secondary" id="manage-products-toggle" type="button" style="margin-top:16px">Administrar catálogo (acesso público)</button>
+        <p class="store-note">Com o app rodando pelo servidor, qualquer visitante pode adicionar, alterar ou remover produtos. As mudanças são compartilhadas; não inclua informações privadas.</p>
+        <form class="product-admin-form" id="product-form" hidden>
+          <h2 id="product-form-title" style="font-size:13px;margin:0 0 10px">Adicionar produto</h2>
+          <input id="product-id" type="hidden">
+          <label for="product-name">Nome do produto</label>
+          <input id="product-name" type="text" maxlength="80" autocomplete="off" required>
+          <label for="product-description">Descrição</label>
+          <textarea id="product-description" maxlength="300"></textarea>
+          <label for="product-price">Preço (R$)</label>
+          <input id="product-price" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" required>
+          <button class="primary" id="product-submit" type="submit">Salvar produto</button>
+          <button class="secondary" id="product-cancel-edit" type="button" hidden>Cancelar edição</button>
+          <p class="feedback" id="product-form-feedback" role="status" aria-live="polite"></p>
+        </form>
+        <div class="product-admin-list" id="product-admin-list" hidden></div>
+      </section>
+
+      <section class="panel special-catalog" id="special-catalog" data-view="special-catalog" aria-labelledby="catalog-title">
+        <div class="panel-heading"><div><h2 id="catalog-title">Catálogo especial</h2><p class="panel-description">Uma seleção de e-books, ferramentas e outros recursos úteis.</p></div><span class="tag">ACESSO ABERTO</span></div>
+        <div class="catalog-banner">
+          <div class="catalog-kicker">Descubra · aprenda · crie</div>
+          <h2>Seu próximo recurso favorito está aqui.</h2>
+          <p>Explore uma seleção de bibliotecas digitais e ferramentas para estudar, trabalhar e criar. Use a busca ou escolha uma categoria.</p>
+        </div>
+        <label class="sr-only" for="catalog-search">Buscar no catálogo</label>
+        <div class="catalog-search"><span class="catalog-search-icon" aria-hidden="true">⌕</span><input id="catalog-search" type="search" placeholder="Buscar e-books, design, edição..." autocomplete="off"></div>
+        <div class="catalog-filters" role="group" aria-label="Filtrar recursos por categoria">
+          <button class="catalog-filter" type="button" data-catalog-category="all" aria-pressed="true">Tudo</button>
+          <button class="catalog-filter" type="button" data-catalog-category="ebooks" aria-pressed="false">E-books</button>
+          <button class="catalog-filter" type="button" data-catalog-category="tools" aria-pressed="false">Ferramentas</button>
+          <button class="catalog-filter" type="button" data-catalog-category="design" aria-pressed="false">Design</button>
+          <button class="catalog-filter" type="button" data-catalog-category="learning" aria-pressed="false">Aprendizado</button>
+        </div>
+        <p class="sr-only" id="catalog-result-count" role="status" aria-live="polite"></p>
+        <div class="catalog-grid" id="catalog-grid" aria-live="polite">
+          <article class="catalog-card" data-category="ebooks" data-search="ebooks livros leitura biblioteca digital dominio publico brasil literatura">
+            <div class="catalog-card-top"><span class="catalog-card-icon" aria-hidden="true">▤</span><span class="catalog-card-category">E-books</span></div>
+            <h3>Domínio Público</h3><p>Biblioteca digital pública brasileira com obras literárias, artísticas e acadêmicas.</p>
+            <a class="catalog-card-link" href="https://www.dominiopublico.gov.br/" target="_blank" rel="noopener noreferrer">Explorar biblioteca <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="catalog-card" data-category="ebooks" data-search="ebooks livros leitura literatura classicos dominio publico internacional">
+            <div class="catalog-card-top"><span class="catalog-card-icon" aria-hidden="true">⌕</span><span class="catalog-card-category">E-books</span></div>
+            <h3>Project Gutenberg</h3><p>Milhares de livros digitais gratuitos, principalmente obras em domínio público.</p>
+            <a class="catalog-card-link" href="https://www.gutenberg.org/" target="_blank" rel="noopener noreferrer">Encontrar livros <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="catalog-card" data-category="ebooks" data-search="ebooks livros didaticos ciencia matematica acesso aberto openstax">
+            <div class="catalog-card-top"><span class="catalog-card-icon" aria-hidden="true">⌂</span><span class="catalog-card-category">E-books</span></div>
+            <h3>OpenStax</h3><p>Livros didáticos de acesso aberto para diversas disciplinas e níveis de estudo.</p>
+            <a class="catalog-card-link" href="https://openstax.org/subjects" target="_blank" rel="noopener noreferrer">Ver livros didáticos <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="catalog-card" data-category="tools" data-search="ferramentas produtividade documentos planilhas apresentacoes editor texto libreoffice">
+            <div class="catalog-card-top"><span class="catalog-card-icon" aria-hidden="true">▦</span><span class="catalog-card-category">Ferramentas</span></div>
+            <h3>LibreOffice</h3><p>Suíte gratuita e de código aberto para textos, planilhas, apresentações e mais.</p>
+            <a class="catalog-card-link" href="https://www.libreoffice.org/discover/libreoffice/" target="_blank" rel="noopener noreferrer">Conhecer ferramenta <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="catalog-card" data-category="tools" data-search="ferramentas imagem edicao fotos editor online photopea">
+            <div class="catalog-card-top"><span class="catalog-card-icon" aria-hidden="true">◩</span><span class="catalog-card-category">Ferramentas</span></div>
+            <h3>Photopea</h3><p>Editor de imagens que funciona no navegador, sem precisar instalar um programa.</p>
+            <a class="catalog-card-link" href="https://www.photopea.com/" target="_blank" rel="noopener noreferrer">Abrir editor <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="catalog-card" data-category="tools" data-search="ferramentas imagem ilustracao fotografia editor gimp codigo aberto">
+            <div class="catalog-card-top"><span class="catalog-card-icon" aria-hidden="true">✳</span><span class="catalog-card-category">Ferramentas</span></div>
+            <h3>GIMP</h3><p>Editor de imagens gratuito e de código aberto para ilustração e fotografia.</p>
+            <a class="catalog-card-link" href="https://www.gimp.org/" target="_blank" rel="noopener noreferrer">Conhecer ferramenta <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="catalog-card" data-category="design" data-search="design criacao graficos apresentacoes modelos canva">
+            <div class="catalog-card-top"><span class="catalog-card-icon" aria-hidden="true">✧</span><span class="catalog-card-category">Design</span></div>
+            <h3>Canva</h3><p>Ferramentas e modelos para criar apresentações, materiais gráficos e publicações.</p>
+            <a class="catalog-card-link" href="https://www.canva.com/" target="_blank" rel="noopener noreferrer">Explorar design <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="catalog-card" data-category="design" data-search="design fontes tipografia letras google fonts">
+            <div class="catalog-card-top"><span class="catalog-card-icon" aria-hidden="true">Aa</span><span class="catalog-card-category">Design</span></div>
+            <h3>Google Fonts</h3><p>Explore famílias tipográficas e confira as condições de uso de cada fonte.</p>
+            <a class="catalog-card-link" href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer">Explorar fontes <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="catalog-card" data-category="learning" data-search="aprendizado aprender programacao desenvolvimento web documentacao html css javascript mdn">
+            <div class="catalog-card-top"><span class="catalog-card-icon" aria-hidden="true">{ }</span><span class="catalog-card-category">Aprendizado</span></div>
+            <h3>MDN Web Docs</h3><p>Documentação e guias para aprender tecnologias da web, incluindo HTML, CSS e JavaScript.</p>
+            <a class="catalog-card-link" href="https://developer.mozilla.org/pt-BR/" target="_blank" rel="noopener noreferrer">Começar a aprender <span aria-hidden="true">↗</span></a>
+          </article>
+          <p class="catalog-empty" id="catalog-empty" hidden>Nenhum recurso encontrado. Tente outra busca ou categoria.</p>
+        </div>
+        <button class="secondary catalog-more" id="catalog-more" type="button" aria-expanded="false" hidden>Mostrar mais recursos</button>
+        <p class="catalog-footnote">Os links levam aos sites oficiais dos respectivos serviços. Disponibilidade, preços e licenças podem mudar; confira os termos de cada recurso antes de usar.</p>
+      </section>
+
+      <div class="notice" data-view="overview" role="note"><span class="notice-icon" aria-hidden="true">!</span><div><strong>Sobre os dados.</strong> A consulta de CNPJ envia o número ao CNPJá e exibe apenas dados cadastrais básicos da empresa. Não exibimos quadro societário, e-mail ou telefone. A lista de sites fica neste navegador. Perguntas enviadas ao assistente são processadas pela OpenAI quando configurada.</div></div>
+
+      <section class="stats" data-view="overview" aria-label="Resumo do painel">
+        <article class="stat"><div class="stat-top"><span>Consultas CNPJ nesta sessão</span><span class="stat-icon">⌕</span></div><strong class="stat-value" id="cnpj-count">0</strong><div class="stat-caption">via CNPJá Open</div></article>
+        <article class="stat"><div class="stat-top"><span>Fontes salvas</span><span class="stat-icon">↗</span></div><strong class="stat-value" id="site-count">0</strong><div class="stat-caption">armazenadas neste navegador</div></article>
+        <article class="stat"><div class="stat-top"><span>Conexão de nuvem</span><span class="stat-icon">◇</span></div><strong class="stat-value" style="font-size:16px">Não configurada</strong><div class="stat-caption">nenhuma conta ou senha é coletada</div></article>
+      </section>
+
+      <div class="content-grid" id="content-grid" hidden>
+        <div>
+          <section class="panel" id="cnpj-search" data-view="cnpj-search" aria-labelledby="cnpj-title">
+            <div class="panel-heading"><div><h2 id="cnpj-title">Consulta de empresa por CNPJ</h2><p class="panel-description">Consulte situação cadastral e atividade econômica em fonte pública.</p></div><span class="tag">CNPJÁ OPEN</span></div>
+            <form id="cnpj-form" novalidate>
+              <label for="cnpj">CNPJ</label>
+              <input id="cnpj" name="cnpj" type="text" inputmode="text" autocomplete="off" maxlength="18" placeholder="00.000.000/0001-91" aria-describedby="cnpj-help cnpj-feedback">
+              <div id="cnpj-help" class="panel-description" style="margin-top:7px">Informe um CNPJ válido, numérico ou alfanumérico. A consulta é enviada ao CNPJá.</div>
+              <button class="primary" id="cnpj-submit" type="submit">⌕ &nbsp; Consultar empresa</button>
+              <p class="feedback" id="cnpj-feedback" role="status" aria-live="polite"></p>
+            </form>
+            <div class="company-results" id="cnpj-results" aria-live="polite" hidden></div>
+            <p class="chat-note">Fonte: <a href="https://open.cnpja.com/" target="_blank" rel="noopener noreferrer" style="color:var(--green)">CNPJá Open API</a>. Disponibilidade e limites podem variar; consulte as condições do provedor antes de uso comercial ou em volume alto.</p>
+          </section>
+
+          <section class="panel" id="phone-search" data-view="phone-search" aria-labelledby="phone-title">
+            <div class="panel-heading"><div><h2 id="phone-title">Busca de telefone</h2><p class="panel-description">Área preparada para uma integração com fonte pública e autorizada.</p></div><span class="tag">SEM CONSULTA EXTERNA</span></div>
+            <form id="phone-form" novalidate>
+              <label for="phone">Número de telefone</label>
+              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="off" placeholder="Ex.: (11) 99999-0000" aria-describedby="phone-help phone-feedback">
+              <div id="phone-help" class="panel-description" style="margin-top:7px">Informe somente um número que você tem autorização para consultar.</div>
+              <label class="consent" for="phone-consent"><input id="phone-consent" type="checkbox"><span>Confirmo que tenho autorização para consultar este número e que usarei uma fonte legal e apropriada.</span></label>
+              <button class="primary" type="submit">⌕ &nbsp; Verificar integração</button>
+              <p class="feedback" id="phone-feedback" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section class="panel" id="trusted-sites" data-view="trusted-sites" aria-labelledby="sites-title" style="margin-top:16px">
+            <div class="panel-heading"><div><h2 id="sites-title">Sites confiáveis</h2><p class="panel-description">Guarde atalhos HTTPS de serviços que você está autorizado a acessar.</p></div><span class="tag">LOCAL</span></div>
+            <form id="site-form" novalidate>
+              <label for="site-name">Nome do serviço</label>
+              <input id="site-name" name="siteName" type="text" maxlength="60" placeholder="Ex.: Portal da equipe" autocomplete="off">
+              <label for="site-url">Endereço HTTPS</label>
+              <input id="site-url" name="siteUrl" type="url" inputmode="url" placeholder="https://exemplo.com" autocomplete="url">
+              <button class="secondary" type="submit" style="margin-top:11px">+ &nbsp; Salvar neste navegador</button>
+              <p class="feedback" id="site-feedback" role="status" aria-live="polite"></p>
+            </form>
+            <hr class="divider">
+            <div class="list-toolbar"><input id="site-filter" type="text" placeholder="Filtrar sites salvos..." aria-label="Filtrar sites salvos"></div>
+            <div class="sites-list" id="sites-list" aria-live="polite"></div>
+          </section>
+        </div>
+
+        <section class="panel" id="access" data-view="access" aria-labelledby="access-title">
+          <div class="panel-heading"><div><h2 id="access-title">Acesso e armazenamento</h2><p class="panel-description">O que é necessário para transformar o protótipo em um serviço real.</p></div><span class="tag">BACKEND</span></div>
+          <ul class="access-list">
+            <li><span>01</span><div><strong>Usuário e senha</strong><br>O servidor valida as contas; as senhas são armazenadas como hashes scrypt e nunca no HTML.</div></li>
+            <li><span>02</span><div><strong>Contas individuais</strong><br>Cadastro público desativado. O administrador cria usuários pelo terminal do servidor.</div></li>
+            <li><span>03</span><div><strong>Sites confiáveis</strong><br>Os atalhos ficam no armazenamento local deste navegador, separados por usuário; ainda não sincronizam com a nuvem.</div></li>
+            <li><span>04</span><div><strong>Busca de telefones</strong><br>Conecte somente um provedor legítimo, com base legal, consentimento e limites de uso adequados.</div></li>
+            <li><span>05</span><div><strong>Assistente OpenAI</strong><br>O servidor local encaminha as perguntas à API sem expor a chave no navegador. Configure a chave como variável de ambiente.</div></li>
+          </ul>
+          <div class="access-footer">O painel está aberto para visitantes. As consultas CNPJ e o assistente usam serviços externos sujeitos a limites. Os sites salvos ficam somente neste navegador.</div>
+        </section>
+      </div>
+      <section class="panel assistant-panel" id="assistant" data-view="assistant" aria-labelledby="assistant-title">
+        <div class="panel-heading"><div><h2 id="assistant-title">Assistente de dúvidas</h2><p class="panel-description">Peça ajuda sobre o painel, segurança digital ou dúvidas gerais.</p></div><span class="tag">OPENAI · VIA BACKEND</span></div>
+        <div class="chat-log" id="chat-log" role="log" aria-live="polite" aria-relevant="additions text">
+          <div class="chat-message assistant">Olá! Sou o assistente do SrGatsby0.1. Posso ajudar com dúvidas e explicar como usar este painel.</div>
+        </div>
+        <form class="chat-form" id="chat-form">
+          <label for="chat-input" class="sr-only">Sua pergunta</label>
+          <input id="chat-input" name="message" type="text" maxlength="2000" autocomplete="off" placeholder="Escreva sua dúvida..." required>
+          <button class="primary" id="chat-send" type="submit">Enviar</button>
+        </form>
+        <p class="chat-note" id="chat-status" role="status" aria-live="polite">As perguntas enviadas são processadas pela OpenAI e não ficam salvas neste navegador. Não envie senhas, dados pessoais ou informações confidenciais.</p>
+      </section>
+      <footer><span>SrGatsby0.1 // ACESSO PÚBLICO</span><span>ACESSO RESPONSÁVEL · DADOS SOB SEU CONTROLE</span></footer>
+    </main>
+  </div>
+  <script>
+    (() => {
+      const loginScreen = document.getElementById('login-screen');
+      const loginForm = document.getElementById('login-form');
+      const loginUsername = document.getElementById('login-username');
+      const loginPassword = document.getElementById('login-password');
+      const loginSubmit = document.getElementById('login-submit');
+      const loginMessage = document.getElementById('login-message');
+      const registerForm = document.getElementById('register-form');
+      const registerInvite = document.getElementById('register-invite');
+      const registerUsername = document.getElementById('register-username');
+      const registerPassword = document.getElementById('register-password');
+      const registerConfirmPassword = document.getElementById('register-confirm-password');
+      const registerSubmit = document.getElementById('register-submit');
+      const registerMessage = document.getElementById('register-message');
+      const showRegister = document.getElementById('show-register');
+      const showLoginButton = document.getElementById('show-login');
+      const enterButton = document.getElementById('enter-button');
+      const landingMessage = document.getElementById('landing-message');
+      const workspace = document.getElementById('workspace');
+      const logoutButton = document.getElementById('logout-button');
+      const currentUsername = document.getElementById('current-username');
+      const userAvatar = document.getElementById('user-avatar');
+      let storageKey = '';
+      const phoneForm = document.getElementById('phone-form');
+      const phoneInput = document.getElementById('phone');
+      const phoneConsent = document.getElementById('phone-consent');
+      const phoneFeedback = document.getElementById('phone-feedback');
+      const cnpjForm = document.getElementById('cnpj-form');
+      const cnpjInput = document.getElementById('cnpj');
+      const cnpjSubmit = document.getElementById('cnpj-submit');
+      const cnpjFeedback = document.getElementById('cnpj-feedback');
+      const cnpjResults = document.getElementById('cnpj-results');
+      const cnpjCount = document.getElementById('cnpj-count');
+      const siteForm = document.getElementById('site-form');
+      const siteNameInput = document.getElementById('site-name');
+      const siteUrlInput = document.getElementById('site-url');
+      const siteFeedback = document.getElementById('site-feedback');
+      const sitesList = document.getElementById('sites-list');
+      const siteCount = document.getElementById('site-count');
+      const siteFilter = document.getElementById('site-filter');
+      const chatForm = document.getElementById('chat-form');
+      const chatInput = document.getElementById('chat-input');
+      const chatLog = document.getElementById('chat-log');
+      const chatSend = document.getElementById('chat-send');
+      const chatStatus = document.getElementById('chat-status');
+      const socialSearchForm = document.getElementById('social-search-form');
+      const socialQueryInput = document.getElementById('social-query');
+      const socialProviderInput = document.getElementById('social-provider');
+      const socialSearchSubmit = document.getElementById('social-search-submit');
+      const socialSearchFeedback = document.getElementById('social-search-feedback');
+      const socialSearchResults = document.getElementById('social-search-results');
+      const socialSavedToggle = document.getElementById('social-saved-toggle');
+      const socialSavedPanel = document.getElementById('social-saved-panel');
+      const socialSavedFeedback = document.getElementById('social-saved-feedback');
+      const socialSavedList = document.getElementById('social-saved-list');
+      const authForms = document.getElementById('auth-forms');
+      const cancelPrivateLogin = document.getElementById('cancel-private-login');
+      const productList = document.getElementById('product-list');
+      const productsFeedback = document.getElementById('products-feedback');
+      const cartItems = document.getElementById('cart-items');
+      const cartCount = document.getElementById('cart-count');
+      const cartTotal = document.getElementById('cart-total');
+      const manageProductsToggle = document.getElementById('manage-products-toggle');
+      const productForm = document.getElementById('product-form');
+      const productIdInput = document.getElementById('product-id');
+      const productNameInput = document.getElementById('product-name');
+      const productDescriptionInput = document.getElementById('product-description');
+      const productPriceInput = document.getElementById('product-price');
+      const productFormTitle = document.getElementById('product-form-title');
+      const productSubmit = document.getElementById('product-submit');
+      const productCancelEdit = document.getElementById('product-cancel-edit');
+      const productFormFeedback = document.getElementById('product-form-feedback');
+      const productAdminList = document.getElementById('product-admin-list');
+      const catalogSearch = document.getElementById('catalog-search');
+      const catalogFilters = document.querySelectorAll('[data-catalog-category]');
+      const catalogCards = document.querySelectorAll('.catalog-card');
+      const catalogEmpty = document.getElementById('catalog-empty');
+      const catalogResultCount = document.getElementById('catalog-result-count');
+      const catalogMore = document.getElementById('catalog-more');
+      const workspaceViews = document.querySelectorAll('main [data-view]');
+      const navigationLinks = document.querySelectorAll('nav[aria-label="Navegação"] a');
+      const contentGrid = document.getElementById('content-grid');
+      const contentColumns = Array.from(contentGrid.children);
+      let activeCatalogCategory = 'all';
+      let catalogExpanded = false;
+      let sites = [];
+      let products = [];
+      let cart = [];
+      let isAuthenticated = false;
+      let productManagerOpen = false;
+      let currentSocialQuery = '';
+      let pendingSocialProfile = null;
+      const cartStorageKey = 'srgatsby-store-cart-v1';
+
+      function showFeedback(element, message, type) {
+        element.textContent = message;
+        element.className = `feedback${type ? ` ${type}` : ''}`;
+      }
+
+      function showWorkspaceView(requestedView) {
+        const view = Array.from(navigationLinks).some((link) => link.hash.slice(1) === requestedView)
+          ? requestedView
+          : 'overview';
+        workspaceViews.forEach((element) => {
+          element.hidden = element.dataset.view !== view;
+        });
+        const visibleColumns = contentColumns.filter((column) => {
+          const hasView = (column.dataset.view === view)
+            || Array.from(column.querySelectorAll('[data-view]')).some((element) => element.dataset.view === view);
+          column.hidden = !hasView;
+          return hasView;
+        });
+        contentGrid.hidden = visibleColumns.length === 0;
+        contentGrid.style.gridTemplateColumns = `repeat(${visibleColumns.length}, minmax(0, 1fr))`;
+        navigationLinks.forEach((link) => {
+          const isActive = link.hash.slice(1) === view;
+          link.classList.toggle('active', isActive);
+          if (isActive) link.setAttribute('aria-current', 'page');
+          else link.removeAttribute('aria-current');
+        });
+      }
+
+      function loadCart() {
+        try {
+          const stored = JSON.parse(localStorage.getItem(cartStorageKey) || '[]');
+          cart = Array.isArray(stored) ? stored.filter((item) => item && typeof item.productId === 'string'
+            && Number.isInteger(item.quantity) && item.quantity > 0 && item.quantity <= 99) : [];
+        } catch (error) {
+          cart = [];
+          showFeedback(productsFeedback, 'Não foi possível ler o carrinho salvo neste navegador.', 'error');
+        }
+      }
+
+      function isValidPasswordFormat(password) {
+        const digits = password.match(/[0-9]/g) || [];
+        const symbols = password.match(/[!@#$%&*_-]/g) || [];
+        return password.length === 6 && digits.length === 5 && symbols.length === 1;
+      }
+
+      function saveSites() {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(sites));
+          return true;
+        } catch (error) {
+          showFeedback(siteFeedback, 'Não foi possível salvar neste navegador. Verifique as permissões de armazenamento.', 'error');
+          return false;
+        }
+      }
+
+      function renderSites() {
+        const filter = siteFilter.value.trim().toLocaleLowerCase('pt-BR');
+        const visibleSites = sites.filter((site) => `${site.name} ${site.url}`.toLocaleLowerCase('pt-BR').includes(filter));
+        sitesList.replaceChildren();
+        siteCount.textContent = String(sites.length);
+        if (visibleSites.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'empty';
+          empty.textContent = sites.length ? 'Nenhum site corresponde ao filtro.' : 'Nenhum site salvo ainda. Adicione uma fonte confiável acima.';
+          sitesList.append(empty);
+          return;
+        }
+        visibleSites.forEach((site) => {
+          const row = document.createElement('div');
+          row.className = 'site-row';
+          const info = document.createElement('div');
+          info.className = 'site-main';
+          const icon = document.createElement('span');
+          icon.className = 'site-icon';
+          icon.setAttribute('aria-hidden', 'true');
+          icon.textContent = '↗';
+          const text = document.createElement('div');
+          text.style.minWidth = '0';
+          const name = document.createElement('div');
+          name.className = 'site-name';
+          name.textContent = site.name;
+          const link = document.createElement('a');
+          link.className = 'site-url';
+          link.href = site.url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = site.url;
+          text.append(name, link);
+          info.append(icon, text);
+          const remove = document.createElement('button');
+          remove.className = 'remove-button';
+          remove.type = 'button';
+          remove.textContent = 'Remover';
+          remove.setAttribute('aria-label', `Remover ${site.name}`);
+          remove.addEventListener('click', () => {
+            const previousSites = sites;
+            sites = sites.filter((item) => item.id !== site.id);
+            if (saveSites()) {
+              showFeedback(siteFeedback, 'Site removido da lista deste navegador.', 'success');
+            } else {
+              sites = previousSites;
+            }
+            renderSites();
+          });
+          row.append(info, remove);
+          sitesList.append(row);
+        });
+      }
+
+      function loadSitesForUser(username) {
+        storageKey = `srgatsby-trusted-sites-v1:${username.toLocaleLowerCase('en-US')}`;
+        sites = [];
+        try {
+          const storedSites = localStorage.getItem(storageKey);
+          if (storedSites) {
+            const parsed = JSON.parse(storedSites);
+            if (Array.isArray(parsed)) {
+              sites = parsed.filter((site) => {
+                if (!site || typeof site.id !== 'string' || typeof site.name !== 'string' || typeof site.url !== 'string') return false;
+                try {
+                  return site.name.trim().length > 0 && new URL(site.url).protocol === 'https:';
+                } catch (error) {
+                  return false;
+                }
+              });
+            }
+          }
+        } catch (error) {
+          showFeedback(siteFeedback, 'Não foi possível ler a lista salva. Você ainda pode adicionar sites nesta sessão.', 'error');
+        }
+        renderSites();
+      }
+
+      const formatPrice = (priceCents) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(priceCents / 100);
+
+      function normalizeCatalogText(value) {
+        return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
+      }
+
+      function renderCatalog() {
+        const query = normalizeCatalogText(catalogSearch.value.trim());
+        let matchingCount = 0;
+        catalogCards.forEach((card) => {
+          const matchesCategory = activeCatalogCategory === 'all' || card.dataset.category === activeCatalogCategory;
+          const matchesSearch = !query || normalizeCatalogText(card.dataset.search || card.textContent).includes(query);
+          const matches = matchesCategory && matchesSearch;
+          matchingCount += Number(matches);
+          card.hidden = !matches || (!catalogExpanded && matchingCount > 6);
+        });
+        catalogEmpty.hidden = matchingCount > 0;
+        catalogMore.hidden = matchingCount <= 6;
+        catalogMore.textContent = catalogExpanded ? 'Mostrar menos' : `Mostrar mais ${matchingCount - 6} recursos`;
+        catalogMore.setAttribute('aria-expanded', String(catalogExpanded));
+        catalogResultCount.textContent = `${matchingCount} ${matchingCount === 1 ? 'recurso encontrado' : 'recursos encontrados'}.`;
+      }
+
+      function saveCart() {
+        try {
+          localStorage.setItem(cartStorageKey, JSON.stringify(cart));
+          return true;
+        } catch (error) {
+          showFeedback(productsFeedback, 'Não foi possível salvar o carrinho neste navegador.', 'error');
+          return false;
+        }
+      }
+
+      function renderCart() {
+        cartItems.replaceChildren();
+        const available = cart.flatMap((item) => {
+          const product = products.find((entry) => entry.id === item.productId);
+          return product ? [{ product, quantity: item.quantity }] : [];
+        });
+        const itemCount = available.reduce((total, item) => total + item.quantity, 0);
+        const total = available.reduce((sum, item) => sum + item.product.priceCents * item.quantity, 0);
+        cartCount.textContent = `${itemCount} ${itemCount === 1 ? 'item' : 'itens'}`;
+        cartTotal.textContent = formatPrice(total);
+
+        if (available.length === 0) {
+          const empty = document.createElement('p');
+          empty.className = 'store-note';
+          empty.textContent = 'Seu carrinho está vazio.';
+          cartItems.append(empty);
+          return;
+        }
+        available.forEach(({ product, quantity }) => {
+          const row = document.createElement('div');
+          row.className = 'cart-item';
+          const details = document.createElement('div');
+          details.className = 'product-details';
+          const name = document.createElement('div');
+          name.className = 'product-name';
+          name.textContent = product.name;
+          const price = document.createElement('div');
+          price.className = 'product-description';
+          price.textContent = `${quantity} × ${formatPrice(product.priceCents)}`;
+          details.append(name, price);
+          const controls = document.createElement('div');
+          controls.className = 'cart-item-controls';
+          const decrease = document.createElement('button');
+          decrease.type = 'button';
+          decrease.textContent = '−';
+          decrease.setAttribute('aria-label', `Remover uma unidade de ${product.name}`);
+          decrease.addEventListener('click', () => changeCartQuantity(product.id, -1));
+          const quantityText = document.createElement('span');
+          quantityText.textContent = String(quantity);
+          quantityText.setAttribute('aria-label', `Quantidade: ${quantity}`);
+          const increase = document.createElement('button');
+          increase.type = 'button';
+          increase.textContent = '+';
+          increase.disabled = quantity >= 99;
+          increase.setAttribute('aria-label', `Adicionar uma unidade de ${product.name}`);
+          increase.addEventListener('click', () => changeCartQuantity(product.id, 1));
+          controls.append(decrease, quantityText, increase);
+          row.append(details, controls);
+          cartItems.append(row);
+        });
+      }
+
+      function changeCartQuantity(productId, amount) {
+        const item = cart.find((entry) => entry.productId === productId);
+        if (!item) return;
+        item.quantity += amount;
+        if (item.quantity <= 0) cart = cart.filter((entry) => entry.productId !== productId);
+        if (item.quantity > 99) item.quantity = 99;
+        if (!saveCart()) {
+          renderCart();
+          return;
+        }
+        renderCart();
+      }
+
+      function addToCart(productId) {
+        const item = cart.find((entry) => entry.productId === productId);
+        if (item) item.quantity = Math.min(item.quantity + 1, 99);
+        else cart.push({ productId, quantity: 1 });
+        if (!saveCart()) {
+          renderCart();
+          return;
+        }
+        renderCart();
+        showFeedback(productsFeedback, 'Produto adicionado ao carrinho.', 'success');
+      }
+
+      function renderProductCatalog() {
+        productList.replaceChildren();
+        if (products.length === 0) {
+          const empty = document.createElement('p');
+          empty.className = 'store-note';
+          empty.textContent = isAuthenticated
+            ? 'Catálogo vazio. Use a administração para cadastrar o primeiro produto.'
+            : 'Ainda não há produtos cadastrados.';
+          productList.append(empty);
+          renderCart();
+          return;
+        }
+
+        products.forEach((product) => {
+          const row = document.createElement('article');
+          row.className = 'product-card';
+          const details = document.createElement('div');
+          details.className = 'product-details';
+          const name = document.createElement('div');
+          name.className = 'product-name';
+          name.textContent = product.name;
+          details.append(name);
+          if (product.description) {
+            const description = document.createElement('p');
+            description.className = 'product-description';
+            description.textContent = product.description;
+            details.append(description);
+          }
+          const price = document.createElement('div');
+          price.className = 'product-price';
+          price.textContent = formatPrice(product.priceCents);
+          const add = document.createElement('button');
+          add.className = 'small-action';
+          add.type = 'button';
+          add.textContent = 'Adicionar';
+          add.addEventListener('click', () => addToCart(product.id));
+          const right = document.createElement('div');
+          right.className = 'social-result-actions';
+          right.append(price, add);
+          row.append(details, right);
+          productList.append(row);
+        });
+        renderCart();
+      }
+
+      function renderProductAdminList() {
+        productAdminList.replaceChildren();
+        if (products.length === 0) return;
+        products.forEach((product) => {
+          const row = document.createElement('div');
+          row.className = 'social-saved-item';
+          const info = document.createElement('div');
+          const name = document.createElement('div');
+          name.className = 'product-name';
+          name.textContent = `${product.name} · ${formatPrice(product.priceCents)}`;
+          const description = document.createElement('div');
+          description.className = 'product-description';
+          description.textContent = product.description || 'Sem descrição';
+          info.append(name, description);
+          const controls = document.createElement('div');
+          controls.className = 'social-result-actions';
+          const edit = document.createElement('button');
+          edit.className = 'small-action';
+          edit.type = 'button';
+          edit.textContent = 'Editar';
+          edit.addEventListener('click', () => {
+            productIdInput.value = product.id;
+            productNameInput.value = product.name;
+            productDescriptionInput.value = product.description;
+            productPriceInput.value = (product.priceCents / 100).toFixed(2);
+            productFormTitle.textContent = 'Editar produto';
+            productSubmit.textContent = 'Atualizar produto';
+            productCancelEdit.hidden = false;
+            productNameInput.focus();
+          });
+          const remove = document.createElement('button');
+          remove.className = 'small-action';
+          remove.type = 'button';
+          remove.textContent = 'Remover';
+          remove.addEventListener('click', () => deleteProduct(product.id));
+          controls.append(edit, remove);
+          row.append(info, controls);
+          productAdminList.append(row);
+        });
+      }
+
+      function setProductManagerOpen(open) {
+        productManagerOpen = open;
+        productForm.hidden = !productManagerOpen;
+        productAdminList.hidden = !productManagerOpen;
+        manageProductsToggle.textContent = productManagerOpen
+          ? 'Fechar administração do catálogo'
+          : 'Administrar catálogo (acesso público)';
+        if (productManagerOpen) renderProductAdminList();
+      }
+
+      async function loadProducts() {
+        try {
+          const response = await fetch('/api/products', { cache: 'no-store' });
+          const data = await readApiResponse(response);
+          if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Não foi possível carregar o catálogo.');
+          products = Array.isArray(data.products) ? data.products.filter((product) => product
+            && typeof product.id === 'string' && typeof product.name === 'string'
+            && Number.isSafeInteger(product.priceCents) && product.priceCents > 0) : [];
+          const productIds = new Set(products.map((product) => product.id));
+          const nextCart = cart.filter((item) => productIds.has(item.productId));
+          const cartChanged = nextCart.length !== cart.length;
+          cart = nextCart;
+          if (cartChanged && !saveCart()) {
+            renderProductCatalog();
+            if (productManagerOpen) renderProductAdminList();
+            return;
+          }
+          renderProductCatalog();
+          if (productManagerOpen) renderProductAdminList();
+          showFeedback(productsFeedback, products.length ? '' : 'Catálogo carregado; ainda não há produtos cadastrados.', '');
+        } catch (error) {
+          showFeedback(productsFeedback, error instanceof TypeError
+            ? 'Não foi possível conectar ao servidor. Abra o app usando node server.js.'
+            : error.message, 'error');
+          renderProductCatalog();
+        }
+      }
+
+      function resetProductForm() {
+        productForm.reset();
+        productIdInput.value = '';
+        productFormTitle.textContent = 'Adicionar produto';
+        productSubmit.textContent = 'Salvar produto';
+        productCancelEdit.hidden = true;
+        showFeedback(productFormFeedback, '', '');
+      }
+
+      async function deleteProduct(id) {
+        try {
+          const response = await fetch(`/api/products/${encodeURIComponent(id)}`, { method: 'DELETE' });
+          const data = await readApiResponse(response);
+          if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Não foi possível remover o produto.');
+          cart = cart.filter((item) => item.productId !== id);
+          saveCart();
+          await loadProducts();
+          showFeedback(productsFeedback, 'Produto removido do catálogo.', 'success');
+        } catch (error) {
+          showFeedback(productFormFeedback, error instanceof TypeError ? 'Não foi possível conectar ao servidor.' : error.message, 'error');
+        }
+      }
+
+      function showWorkspace(username) {
+        currentUsername.textContent = username;
+        userAvatar.textContent = username.slice(0, 1).toUpperCase();
+        isAuthenticated = username !== 'Visitante';
+        loadSitesForUser(username);
+        loginScreen.hidden = true;
+        workspace.hidden = false;
+        socialSavedToggle.textContent = isAuthenticated ? 'Abrir meu arquivo privado' : 'Entrar para ver arquivos privados';
+        socialSavedPanel.hidden = true;
+        productManagerOpen = false;
+        productForm.hidden = true;
+        productAdminList.hidden = true;
+        manageProductsToggle.textContent = 'Administrar catálogo (acesso público)';
+        loadProducts();
+      }
+
+      function showLogin(message = '') {
+        workspace.hidden = true;
+        loginScreen.hidden = false;
+        authForms.hidden = true;
+        enterButton.hidden = false;
+        isAuthenticated = false;
+        landingMessage.textContent = message;
+      }
+
+      function openPrivateLogin() {
+        loginScreen.hidden = false;
+        authForms.hidden = false;
+        enterButton.hidden = true;
+        loginForm.hidden = false;
+        registerForm.hidden = true;
+        showRegister.hidden = false;
+        showLoginButton.hidden = true;
+        loginMessage.textContent = '';
+        registerMessage.textContent = '';
+        loginUsername.focus();
+      }
+
+      function showRegistration() {
+        loginMessage.textContent = '';
+        registerMessage.textContent = '';
+        loginForm.hidden = true;
+        registerForm.hidden = false;
+        showRegister.hidden = true;
+        showLoginButton.hidden = false;
+        registerInvite.focus();
+      }
+
+      function renderSocialResults(results) {
+        socialSearchResults.replaceChildren();
+        results.forEach((profile) => {
+          const row = document.createElement('article');
+          row.className = 'social-result';
+          const info = document.createElement('div');
+          info.className = 'social-result-info';
+          const title = document.createElement('div');
+          title.className = 'social-result-title';
+          title.textContent = profile.displayName || profile.handle;
+          const meta = document.createElement('div');
+          meta.className = 'social-result-meta';
+          meta.textContent = `${profile.provider === 'bluesky' ? 'Bluesky' : 'Mastodon'} · @${profile.handle}`;
+          info.append(title, meta);
+          if (profile.bio) {
+            const bio = document.createElement('p');
+            bio.className = 'social-result-bio';
+            bio.textContent = profile.bio;
+            info.append(bio);
+          }
+          const actions = document.createElement('div');
+          actions.className = 'social-result-actions';
+          const open = document.createElement('a');
+          open.href = profile.profileUrl;
+          open.target = '_blank';
+          open.rel = 'noopener noreferrer';
+          open.textContent = 'Abrir perfil ↗';
+          const save = document.createElement('button');
+          save.className = 'small-action';
+          save.type = 'button';
+          save.textContent = 'Salvar';
+          save.addEventListener('click', () => {
+            if (!isAuthenticated) {
+              pendingSocialProfile = profile;
+              openPrivateLogin();
+              socialSearchFeedback.textContent = 'Entre na sua conta para salvar este perfil no arquivo privado.';
+              return;
+            }
+            saveSocialProfile(profile);
+          });
+          actions.append(open, save);
+          row.append(info, actions);
+          socialSearchResults.append(row);
+        });
+        if (results.length === 0) {
+          const empty = document.createElement('p');
+          empty.className = 'social-search-note';
+          empty.textContent = 'Nenhum perfil público encontrado para essa pesquisa.';
+          socialSearchResults.append(empty);
+        }
+      }
+
+      function renderSavedSocialProfiles(results) {
+        socialSavedList.replaceChildren();
+        results.forEach((record) => {
+          const profile = record.profile;
+          if (!profile || typeof profile.handle !== 'string' || typeof profile.profileUrl !== 'string') return;
+          const row = document.createElement('div');
+          row.className = 'social-saved-item';
+          const info = document.createElement('div');
+          const link = document.createElement('a');
+          link.href = profile.profileUrl;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = `${profile.displayName || profile.handle} (@${profile.handle})`;
+          link.style.color = 'var(--green)';
+          link.style.fontSize = '11px';
+          const savedAt = document.createElement('div');
+          savedAt.className = 'social-result-meta';
+          savedAt.textContent = `Salvo em ${new Date(record.savedAt).toLocaleString('pt-BR')} · busca: ${record.query}`;
+          info.append(link, savedAt);
+          const remove = document.createElement('button');
+          remove.className = 'small-action';
+          remove.type = 'button';
+          remove.textContent = 'Remover';
+          remove.addEventListener('click', () => deleteSavedSocialProfile(record.id));
+          row.append(info, remove);
+          socialSavedList.append(row);
+        });
+        if (results.length === 0) {
+          const empty = document.createElement('p');
+          empty.className = 'social-search-note';
+          empty.textContent = 'Ainda não há perfis salvos nesta conta.';
+          socialSavedList.append(empty);
+        }
+      }
+
+      async function loadSavedSocialProfiles() {
+        showFeedback(socialSavedFeedback, 'Carregando arquivo privado...', '');
+        try {
+          const response = await fetch('/api/social-saved', { cache: 'no-store' });
+          const data = await readApiResponse(response);
+          if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Não foi possível abrir o arquivo privado.');
+          renderSavedSocialProfiles(Array.isArray(data.results) ? data.results : []);
+          showFeedback(socialSavedFeedback, '', '');
+        } catch (error) {
+          showFeedback(socialSavedFeedback, error instanceof TypeError
+            ? 'Não foi possível conectar ao servidor do app.'
+            : error.message, 'error');
+        }
+      }
+
+      async function saveSocialProfile(profile) {
+        const saveButton = Array.from(socialSearchResults.querySelectorAll('.small-action'))
+          .find((button) => button.textContent === 'Salvar' && button.closest('.social-result')?.querySelector('.social-result-meta')?.textContent.includes(profile.handle));
+        if (saveButton) saveButton.disabled = true;
+        try {
+          const response = await fetch('/api/social-saved', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: profile.provider, query: currentSocialQuery, profileId: profile.id })
+          });
+          const data = await readApiResponse(response);
+          if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Não foi possível salvar o perfil.');
+          showFeedback(socialSearchFeedback, data.alreadySaved ? 'Este perfil já está salvo no seu arquivo privado.' : 'Perfil salvo no seu arquivo privado.', 'success');
+          if (!socialSavedPanel.hidden) await loadSavedSocialProfiles();
+        } catch (error) {
+          if (error instanceof TypeError) {
+            showFeedback(socialSearchFeedback, 'Não foi possível conectar ao servidor do app.', 'error');
+          } else if (error.message.includes('sessão expirou')) {
+            pendingSocialProfile = profile;
+            openPrivateLogin();
+            showFeedback(loginMessage, 'Entre na sua conta para salvar este perfil.', 'error');
+          } else {
+            showFeedback(socialSearchFeedback, error.message, 'error');
+          }
+        } finally {
+          if (saveButton) saveButton.disabled = false;
+        }
+      }
+
+      async function deleteSavedSocialProfile(id) {
+        try {
+          const response = await fetch(`/api/social-saved/${encodeURIComponent(id)}`, { method: 'DELETE' });
+          const data = await readApiResponse(response);
+          if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Não foi possível remover o perfil.');
+          await loadSavedSocialProfiles();
+        } catch (error) {
+          showFeedback(socialSavedFeedback, error instanceof TypeError ? 'Não foi possível conectar ao servidor do app.' : error.message, 'error');
+        }
+      }
+
+      function expireSession() {
+        storageKey = '';
+        sites = [];
+        showLogin('Sua sessão expirou. Entre novamente para continuar.');
+      }
+
+      async function readApiResponse(response) {
+        try {
+          return await response.json();
+        } catch (error) {
+          throw new Error('O servidor retornou uma resposta inválida. Inicie o SrGatsby0.1 com "node server.js".');
+        }
+      }
+
+      async function checkSession() {
+        if (location.protocol === 'file:') {
+          showLogin('Inicie o servidor e abra http://127.0.0.1:3000 para entrar com segurança.');
+          return;
+        }
+        try {
+          const response = await fetch('/api/session', { cache: 'no-store' });
+          const data = await readApiResponse(response);
+          if (response.ok && data.authenticated && typeof data.username === 'string') {
+            showWorkspace(data.username);
+          } else {
+            showLogin();
+          }
+        } catch (error) {
+          showLogin(error.message);
+        }
+      }
+
+      enterButton.addEventListener('click', () => showWorkspace('Visitante'));
+      cancelPrivateLogin.addEventListener('click', () => {
+        authForms.hidden = true;
+        loginScreen.hidden = true;
+        enterButton.hidden = false;
+        loginMessage.textContent = '';
+        pendingSocialProfile = null;
+      });
+
+      socialSearchForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        currentSocialQuery = socialQueryInput.value.trim();
+        if (!currentSocialQuery) return;
+        socialSearchSubmit.disabled = true;
+        socialSearchSubmit.textContent = 'Pesquisando...';
+        showFeedback(socialSearchFeedback, 'Consultando fontes públicas...', '');
+        socialSearchResults.replaceChildren();
+        try {
+          const response = await fetch('/api/social-search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: currentSocialQuery, provider: socialProviderInput.value })
+          });
+          const data = await readApiResponse(response);
+          if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Não foi possível pesquisar agora.');
+          const results = Array.isArray(data.results) ? data.results : [];
+          renderSocialResults(results);
+          const warning = Array.isArray(data.warnings) && data.warnings.length ? ` ${data.warnings.join(' ')}` : '';
+          showFeedback(socialSearchFeedback, `${results.length} perfil(is) público(s) encontrado(s).${warning}`, data.warnings?.length ? 'error' : 'success');
+        } catch (error) {
+          showFeedback(socialSearchFeedback, error instanceof TypeError
+            ? 'Não foi possível conectar ao servidor. Abra o app usando node server.js.'
+            : error.message, 'error');
+        } finally {
+          socialSearchSubmit.disabled = false;
+          socialSearchSubmit.textContent = '⌕   Pesquisar';
+        }
+      });
+
+      socialSavedToggle.addEventListener('click', async () => {
+        if (!isAuthenticated) {
+          openPrivateLogin();
+          return;
+        }
+        socialSavedPanel.hidden = !socialSavedPanel.hidden;
+        if (!socialSavedPanel.hidden) await loadSavedSocialProfiles();
+      });
+
+      manageProductsToggle.addEventListener('click', () => {
+        setProductManagerOpen(!productManagerOpen);
+      });
+
+      productForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const price = Number(productPriceInput.value);
+        const priceCents = Math.round(price * 100);
+        if (!Number.isFinite(price) || priceCents < 1 || priceCents > 100_000_000) {
+          showFeedback(productFormFeedback, 'Informe um preço entre R$ 0,01 e R$ 1.000.000,00.', 'error');
+          productPriceInput.focus();
+          return;
+        }
+        productSubmit.disabled = true;
+        productSubmit.textContent = 'Salvando...';
+        try {
+          const id = productIdInput.value;
+          const response = await fetch(id ? `/api/products/${encodeURIComponent(id)}` : '/api/products', {
+            method: id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: productNameInput.value.trim(),
+              description: productDescriptionInput.value.trim(),
+              priceCents
+            })
+          });
+          const data = await readApiResponse(response);
+          if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Não foi possível salvar o produto.');
+          resetProductForm();
+          await loadProducts();
+          showFeedback(productsFeedback, id ? 'Produto atualizado.' : 'Produto adicionado ao catálogo.', 'success');
+        } catch (error) {
+          showFeedback(productFormFeedback, error instanceof TypeError ? 'Não foi possível conectar ao servidor.' : error.message, 'error');
+        } finally {
+          productSubmit.disabled = false;
+          productSubmit.textContent = productIdInput.value ? 'Atualizar produto' : 'Salvar produto';
+        }
+      });
+
+      productCancelEdit.addEventListener('click', resetProductForm);
+      navigationLinks.forEach((link) => {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          const view = link.hash.slice(1);
+          showWorkspaceView(view);
+          if (window.location.hash !== link.hash) window.location.hash = link.hash;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+      window.addEventListener('hashchange', () => {
+        showWorkspaceView(window.location.hash.slice(1));
+      });
+      showWorkspaceView(window.location.hash.slice(1) || 'overview');
+      catalogSearch.addEventListener('input', renderCatalog);
+      catalogMore.addEventListener('click', () => {
+        catalogExpanded = !catalogExpanded;
+        renderCatalog();
+      });
+      catalogFilters.forEach((filter) => {
+        filter.addEventListener('click', () => {
+          activeCatalogCategory = filter.dataset.catalogCategory;
+          catalogFilters.forEach((button) => {
+            button.setAttribute('aria-pressed', String(button === filter));
+          });
+          renderCatalog();
+        });
+      });
+      renderCatalog();
+      loadCart();
+      renderCart();
+
+      loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        loginMessage.textContent = '';
+        if (!isValidPasswordFormat(loginPassword.value)) {
+          loginMessage.textContent = 'A senha precisa ter exatamente 5 números e 1 símbolo, totalizando 6 caracteres.';
+          loginPassword.focus();
+          return;
+        }
+        loginSubmit.disabled = true;
+        loginSubmit.textContent = 'Verificando...';
+        try {
+          const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: loginUsername.value.trim(), password: loginPassword.value })
+          });
+          const data = await readApiResponse(response);
+          if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Não foi possível entrar.');
+          loginPassword.value = '';
+          loginForm.reset();
+          showWorkspace(data.username);
+          isAuthenticated = true;
+          if (pendingSocialProfile) {
+            const profile = pendingSocialProfile;
+            pendingSocialProfile = null;
+            await saveSocialProfile(profile);
+          }
+          if (!socialSavedPanel.hidden) await loadSavedSocialProfiles();
+        } catch (error) {
+          loginMessage.textContent = error instanceof TypeError
+            ? 'Não foi possível conectar ao servidor. Verifique se o painel foi iniciado por node server.js.'
+            : error.message;
+          loginPassword.value = '';
+          loginPassword.focus();
+        } finally {
+          loginSubmit.disabled = false;
+          loginSubmit.textContent = 'Entrar com segurança';
+        }
+      });
+
+      showRegister.addEventListener('click', showRegistration);
+      showLoginButton.addEventListener('click', () => {
+        loginMessage.textContent = '';
+        loginForm.hidden = false;
+        registerForm.hidden = true;
+        showRegister.hidden = false;
+        showLoginButton.hidden = true;
+        loginUsername.focus();
+      });
+
+      registerForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        registerMessage.textContent = '';
+        if (!isValidPasswordFormat(registerPassword.value)) {
+          registerMessage.textContent = 'A senha precisa ter exatamente 5 números e 1 símbolo, totalizando 6 caracteres.';
+          registerPassword.focus();
+          return;
+        }
+        if (registerPassword.value !== registerConfirmPassword.value) {
+          registerMessage.textContent = 'As senhas não coincidem.';
+          registerConfirmPassword.focus();
+          return;
+        }
+
+        registerSubmit.disabled = true;
+        registerSubmit.textContent = 'Criando conta...';
+        try {
+          const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              invite: registerInvite.value.trim(),
+              username: registerUsername.value.trim(),
+              password: registerPassword.value
+            })
+          });
+          const data = await readApiResponse(response);
+          if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : 'Não foi possível criar a conta.');
+          registerForm.reset();
+          showWorkspace(data.username);
+          isAuthenticated = true;
+        } catch (error) {
+          registerMessage.textContent = error instanceof TypeError
+            ? 'Não foi possível conectar ao servidor. Verifique se o painel foi iniciado por node server.js.'
+            : error.message;
+          registerPassword.value = '';
+          registerConfirmPassword.value = '';
+          registerInvite.focus();
+        } finally {
+          registerSubmit.disabled = false;
+          registerSubmit.textContent = 'Criar minha conta';
+        }
+      });
+
+      logoutButton.addEventListener('click', async () => {
+        logoutButton.disabled = true;
+        try {
+          const response = await fetch('/api/logout', { method: 'POST' });
+          if (!response.ok) throw new Error('Não foi possível encerrar a sessão. Tente novamente.');
+          sites = [];
+          storageKey = '';
+          showLogin();
+        } catch (error) {
+          showFeedback(socialSavedFeedback, error.message, 'error');
+        } finally {
+          logoutButton.disabled = false;
+        }
+      });
+
+      function isValidCnpj(value) {
+        const cnpj = value.replace(/[^a-z\d]/gi, '').toUpperCase();
+        if (!/^[A-Z\d]{12}\d{2}$/.test(cnpj) || /^(\w)\1{13}$/.test(cnpj)) return false;
+        const calculateDigit = (base, weights) => {
+          const sum = base.split('').reduce((total, character, index) => total + (character.charCodeAt(0) - 48) * weights[index], 0);
+          const remainder = sum % 11;
+          return remainder < 2 ? 0 : 11 - remainder;
+        };
+        const firstDigit = calculateDigit(cnpj.slice(0, 12), [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+        const secondDigit = calculateDigit(cnpj.slice(0, 12) + firstDigit, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+        return cnpj.endsWith(`${firstDigit}${secondDigit}`);
+      }
+
+      function formatCnpj(value) {
+        const cnpj = value.replace(/[^a-z\d]/gi, '').toUpperCase().slice(0, 14);
+        return cnpj
+          .replace(/^([A-Z\d]{2})([A-Z\d])/, '$1.$2')
+          .replace(/^([A-Z\d]{2}\.[A-Z\d]{3})([A-Z\d])/, '$1.$2')
+          .replace(/^([A-Z\d]{2}\.[A-Z\d]{3}\.[A-Z\d]{3})([A-Z\d])/, '$1/$2')
+          .replace(/^([A-Z\d]{2}\.[A-Z\d]{3}\.[A-Z\d]{3}\/[A-Z\d]{4})(\d{1,2})$/, '$1-$2');
+      }
+
+      function renderCompany(data) {
+        const location = [data.municipio, data.uf].filter(Boolean).join(' / ');
+        const address = [data.logradouro, data.numero, data.bairro].filter(Boolean).join(', ');
+        const regime = [
+          typeof data.simples === 'boolean' ? `Simples Nacional: ${data.simples ? 'optante' : 'não optante'}` : '',
+          typeof data.mei === 'boolean' ? `MEI: ${data.mei ? 'optante' : 'não optante'}` : ''
+        ].filter(Boolean).join(' · ');
+        const activities = Array.isArray(data.atividadesSecundarias)
+          ? data.atividadesSecundarias.filter((activity) => typeof activity === 'string' && activity.trim()).slice(0, 5).join(' · ')
+          : '';
+        const capital = typeof data.capitalSocial === 'number' && Number.isFinite(data.capitalSocial)
+          ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(data.capitalSocial)
+          : '';
+        const fields = [
+          ['CNPJ', data.cnpj, false],
+          ['Situação cadastral', data.situacao, false],
+          ['Razão social', data.razaoSocial, true],
+          ['Nome fantasia', data.nomeFantasia, true],
+          ['Início das atividades', data.dataAbertura, false],
+          ['Matriz / filial', data.matriz ? 'Matriz' : data.matriz === false ? 'Filial' : '', false],
+          ['Natureza jurídica', data.naturezaJuridica, true],
+          ['Porte', data.porte, false],
+          ['Capital social', capital, false],
+          ['Atividade principal', data.atividadePrincipal, true],
+          ['Atividades secundárias', activities, true],
+          ['Regime tributário', regime, true],
+          ['Endereço comercial', address, true],
+          ['CEP', data.cep, false],
+          ['Município / UF', location, false]
+        ].filter(([, value]) => typeof value === 'string' && value.trim());
+
+        cnpjResults.replaceChildren();
+        for (const [label, value, wide] of fields) {
+          const field = document.createElement('div');
+          field.className = `company-field${wide ? ' wide' : ''}`;
+          const title = document.createElement('div');
+          title.className = 'company-label';
+          title.textContent = label;
+          const content = document.createElement('div');
+          content.className = 'company-value';
+          content.textContent = value;
+          field.append(title, content);
+          cnpjResults.append(field);
+        }
+        cnpjResults.hidden = false;
+      }
+
+      cnpjInput.addEventListener('input', () => {
+        const start = cnpjInput.selectionStart;
+        const previousLength = cnpjInput.value.length;
+        cnpjInput.value = formatCnpj(cnpjInput.value);
+        const position = Math.max(0, (start || 0) + cnpjInput.value.length - previousLength);
+        cnpjInput.setSelectionRange(position, position);
+      });
+
+      cnpjForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const taxId = cnpjInput.value.replace(/[^a-z\d]/gi, '').toUpperCase();
+        cnpjResults.hidden = true;
+        cnpjResults.replaceChildren();
+        if (!isValidCnpj(cnpjInput.value)) {
+          showFeedback(cnpjFeedback, 'Digite um CNPJ válido com 14 caracteres, incluindo dois dígitos verificadores no final.', 'error');
+          return;
+        }
+        if (location.protocol === 'file:') {
+          showFeedback(cnpjFeedback, 'Abra o painel pelo servidor: configure o Node.js e inicie com "node server.js"; depois acesse http://127.0.0.1:3000.', 'error');
+          return;
+        }
+
+        cnpjSubmit.disabled = true;
+        cnpjSubmit.textContent = 'Consultando...';
+        showFeedback(cnpjFeedback, 'Consultando o CNPJá...', '');
+        try {
+          const response = await fetch('/api/company', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cnpj: taxId })
+          });
+          let data;
+          try {
+            data = await response.json();
+          } catch (error) {
+            throw new Error('O servidor retornou uma resposta inválida. Confirme se o backend do SrGatsby0.1 está em execução.');
+          }
+          if (response.status === 401) {
+            expireSession();
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(typeof data.error === 'string' ? data.error : `A consulta falhou (${response.status}).`);
+          }
+          renderCompany(data);
+          cnpjCount.textContent = String(Number(cnpjCount.textContent) + 1);
+          showFeedback(cnpjFeedback, 'Consulta concluída. Dados básicos recebidos do CNPJá.', 'success');
+        } catch (error) {
+          const message = error instanceof TypeError
+            ? 'Não foi possível conectar. Inicie o servidor com "node server.js" e abra http://127.0.0.1:3000.'
+            : error.message;
+          showFeedback(cnpjFeedback, message, 'error');
+        } finally {
+          cnpjSubmit.disabled = false;
+          cnpjSubmit.textContent = '⌕   Consultar empresa';
+        }
+      });
+
+      phoneForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const digits = phoneInput.value.replace(/\D/g, '');
+        if (digits.length < 10 || digits.length > 13) {
+          showFeedback(phoneFeedback, 'Confira o número informado. Use entre 10 e 13 dígitos, incluindo o código do país se necessário.', 'error');
+          return;
+        }
+        if (!phoneConsent.checked) {
+          showFeedback(phoneFeedback, 'Confirme que tem autorização antes de continuar.', 'error');
+          return;
+        }
+        showFeedback(phoneFeedback, 'Número validado para demonstração. Nenhuma busca foi feita: conecte aqui um provedor autorizado no backend.', 'info');
+      });
+
+      siteForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = siteNameInput.value.trim();
+        const rawUrl = siteUrlInput.value.trim();
+        if (!name || !rawUrl) {
+          showFeedback(siteFeedback, 'Preencha o nome e o endereço do site.', 'error');
+          return;
+        }
+        let parsedUrl;
+        try {
+          parsedUrl = new URL(rawUrl);
+        } catch (error) {
+          showFeedback(siteFeedback, 'Informe um endereço válido, como https://exemplo.com.', 'error');
+          return;
+        }
+        if (parsedUrl.protocol !== 'https:') {
+          showFeedback(siteFeedback, 'Por segurança, só são aceitos endereços HTTPS.', 'error');
+          return;
+        }
+        if (sites.some((site) => site.url === parsedUrl.href)) {
+          showFeedback(siteFeedback, 'Este endereço já está salvo.', 'error');
+          return;
+        }
+        sites.unshift({ id: crypto.randomUUID(), name, url: parsedUrl.href });
+        if (saveSites()) {
+          siteForm.reset();
+          showFeedback(siteFeedback, 'Site salvo somente neste navegador.', 'success');
+          renderSites();
+        } else {
+          sites.shift();
+          renderSites();
+        }
+      });
+
+      siteFilter.addEventListener('input', renderSites);
+
+      function addChatMessage(text, role, isError = false) {
+        const message = document.createElement('div');
+        message.className = `chat-message ${role}${isError ? ' error' : ''}`;
+        message.textContent = text;
+        chatLog.append(message);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+
+      chatForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const message = chatInput.value.trim();
+        if (!message || chatSend.disabled) return;
+
+        addChatMessage(message, 'user');
+        chatInput.value = '';
+        chatSend.disabled = true;
+        chatSend.textContent = 'Aguarde...';
+        chatStatus.textContent = 'Enviando pergunta ao assistente...';
+        try {
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+          });
+          const data = await response.json();
+          if (response.status === 401) {
+            expireSession();
+            return;
+          }
+          if (!response.ok) {
+            if (response.status === 404) throw new Error('O endpoint /api/chat ainda não está configurado. A chave da OpenAI deve ser adicionada somente no backend.');
+            throw new Error(typeof data.error === 'string' ? data.error : `O serviço de chat respondeu com erro (${response.status}). Tente novamente mais tarde.`);
+          }
+          if (!data || typeof data.reply !== 'string' || !data.reply.trim()) {
+            throw new Error('O serviço de chat retornou uma resposta inválida.');
+          }
+          addChatMessage(data.reply.trim(), 'assistant');
+          chatStatus.textContent = 'Resposta recebida. A conversa não foi salva.';
+        } catch (error) {
+          const detail = error instanceof TypeError
+            ? 'Não foi possível conectar ao serviço de chat. Verifique a conexão e se o backend está disponível.'
+            : error.message;
+          addChatMessage(detail, 'assistant', true);
+          chatStatus.textContent = 'Não foi possível obter uma resposta.';
+        } finally {
+          chatSend.disabled = false;
+          chatSend.textContent = 'Enviar';
+          chatInput.focus();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
